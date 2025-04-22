@@ -354,6 +354,439 @@ local Button = Tab:CreateButton({
    end,
 })
 
+local Tab = Window:CreateTab("zynlope", 85391913891710) -- Title, Image
+local Section = Tab:CreateSection("bullshit by me")
+
+local Button = Tab:CreateButton({
+   Name = "Firework fling (BUGGY)",
+   Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/rolezeay/fireworkfilng/refs/heads/main/hmmm"))()
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Chat Mimicker",
+   Callback = function()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/rolezeay/chatmimicker/refs/heads/main/hmmm"))()
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Chat Logger",
+   Callback = function()
+                          if game:service('RunService'):IsStudio() then print('!STUDIO!') else
+    if game:service('CoreGui'):findFirstChild('LogHolder') then return nil
+    end
+end
+
+local LogHolder = Instance.new("ScreenGui")
+local Logs = Instance.new("Frame")
+local Scroll = Instance.new("ScrollingFrame")
+local Template = Instance.new("TextLabel")
+
+LogHolder.Name = "LogHolder"
+if game:service('RunService'):IsStudio() then LogHolder.Parent = game.Players.LocalPlayer.PlayerGui else
+    LogHolder.Parent = game.CoreGui
+end
+
+Logs.Name = "Logs"
+Logs.Parent = LogHolder
+Logs.AnchorPoint = Vector2.new(0.5, 0.5)
+Logs.BackgroundColor3 = Color3.new(0, 0, 0)
+Logs.Position = UDim2.new(0.200000003, 0, 0.200000003, 0)
+Logs.Size = UDim2.new(0, 400, 0, 250)
+Logs.Style = Enum.FrameStyle.DropShadow
+
+Scroll.Name = "Scroll"
+Scroll.Parent = Logs
+Scroll.BackgroundColor3 = Color3.new(0, 0, 0)
+Scroll.BackgroundTransparency = 1
+Scroll.BorderSizePixel = 0
+Scroll.Size = UDim2.new(1, 0, 1, 0)
+Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+Scroll.ScrollBarThickness = 6
+
+Template.Name = "Template"
+Template.Parent = Logs
+Template.BackgroundColor3 = Color3.new(1, 1, 1)
+Template.BackgroundTransparency = 1
+Template.Position = UDim2.new(0, 0, 0, -25)
+Template.Size = UDim2.new(1, 0, 0, 20)
+Template.Font = Enum.Font.ArialBold
+Template.Text = ""
+Template.TextColor3 = Color3.new(1, 1, 1)
+Template.TextSize = 15
+Template.TextXAlignment = Enum.TextXAlignment.Left
+Template.TextWrap = true
+
+Logs.Active = true
+Logs.Draggable = true
+
+local loggedTable = {}
+
+local getTotalSize = function()
+local totalSize = UDim2.new(0, 0, 0, 0)
+    
+    for i, v in next, loggedTable do
+        totalSize = totalSize + UDim2.new(0, 0, 0, v.Size.Y.Offset)
+    end
+    
+    return totalSize
+end
+
+local BUD = UDim2.new(0, 0, 0, 0)
+local TotalNum = 0
+
+local function GenLog(txt, colo, time)
+    local oldColo = Color3.fromRGB(0, 0, 0) 
+    
+    local Temp = Template:Clone()
+    Temp.Parent = Scroll
+    Temp.Name = txt..'Logged'
+    Temp.Text = tostring(txt)
+    Temp.Visible = true
+    Temp.Position = BUD + UDim2.new(0, 0, 0, 0)
+    if colo then oldColo = colo Temp.TextColor3 = colo elseif not colo then Temp.TextColor3 = Color3.fromRGB(200, 200, 200) end
+    local timeVal = Instance.new('StringValue', Temp)
+    timeVal.Name = 'TimeVal'
+    timeVal.Value = time
+
+    TotalNum = TotalNum + 1
+    
+    if not Temp.TextFits then repeat Temp.Size = UDim2.new(Temp.Size.X.Scale, Temp.Size.X.Offset, Temp.Size.Y.Scale, Temp.Size.Y.Offset + 10)
+        Temp.Text = txt
+    until Temp.TextFits 
+end
+
+    BUD = BUD + UDim2.new(0, 0, 0, Temp.Size.Y.Offset)
+    
+    table.insert(loggedTable, Temp)
+    
+    local totSize = getTotalSize()
+    
+    if totSize.Y.Offset >= Scroll.CanvasSize.Y.Offset then Scroll.CanvasSize = UDim2.new(totSize.X.Scale, totSize.X.Offset, totSize.Y.Scale, totSize.Y.Offset + 100)
+    Scroll.CanvasPosition = Scroll.CanvasPosition + Vector2.new(0, totSize.Y.Offset) 
+    end
+    
+    return Temp
+end
+
+local ChatData = ""
+
+local function SaveToFile()
+    local t = os.date("*t")
+    local dateDat = t['hour']..' '..t['min']..' '..t['sec']..' '..t['day']..'.'..t['month']..'.'..t['year']
+    
+    ChatData = ""
+    
+    for i, v in pairs(Scroll:GetChildren()) do
+        ChatData = ChatData..v.TimeVal.Value..' '..v.Text..'\n'
+    end
+    
+    writefile('ChatLogs '..dateDat..'.txt', ChatData)
+end
+
+local function Clear()
+    loggedTable = {}
+    ChatData = ""
+    Scroll.CanvasPosition = Vector2.new(0, 0)
+    for i, v in pairs(Scroll:GetChildren()) do
+        v:Destroy()
+    end
+    Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
+    BUD = UDim2.new(0, 0, 0, 0)
+end
+
+local LogPlr = function(plr)
+            plr.Chatted:connect(function(msg)
+                
+            local t = os.date("*t")
+            local dateDat = t['hour']..':'..t['min']..':'..t['sec']
+    
+            if string.len(msg) >= 1000 then return nil end
+            if string.lower(msg) == 'clear' and plr == game:service('Players').LocalPlayer then Clear() return nil end
+            if string.lower(msg) == 'savetofile' and plr == game:service('Players').LocalPlayer then SaveToFile() return nil end
+            if string.sub(msg, 1, 1):match('%p') and string.sub(msg, 2, 2):match('%a') and string.len(msg) >= 5 then GenLog(plr.Name..': '..msg, Color3.new(255, 0, 0), dateDat) else
+            GenLog(plr.Name..': '..msg, Color3.new(255, 255, 255), dateDat)
+            end
+    end)
+end
+
+for i, v in pairs(game.Players:GetChildren()) do
+    LogPlr(v)
+end
+
+game.Players.PlayerAdded:connect(function(plr)
+    LogPlr(plr)
+end)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Load E to rewind character",
+   Callback = function()
+      local key = "E"
+local flashbacklength = 80
+local flashbackspeed = 1.5
+
+if not game:IsLoaded() then game.Loaded:Wait() end
+
+local name = "FlashbackSystem"
+local frames, uis, LP, RS = {}, game:GetService("UserInputService"), game:GetService("Players").LocalPlayer, game:GetService("RunService")
+
+local VRService = game:GetService("VRService")
+if VRService.VREnabled then return end
+
+game:GetService("StarterPlayer").DevComputerMovementMode = Enum.DevComputerMovementMode.KeyboardMouse
+game:GetService("StarterPlayer").DevTouchMovementMode = Enum.DevTouchMovementMode.Thumbstick
+
+if not LP or not uis then return end
+
+pcall(RS.UnbindFromRenderStep, RS, name)
+
+local function getchar()
+   return LP.Character or LP.CharacterAdded:Wait()
+end
+
+function gethrp(c)
+   return c and (c:FindFirstChild("HumanoidRootPart") or c.RootPart or c.PrimaryPart or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso") or c:FindFirstChildWhichIsA("BasePart"))
+end
+
+local flashback = { lastinput = false, canrevert = true }
+
+function flashback:Advance(char, hrp, hum, allowinput)
+   if not char or not hrp or not hum then return end
+   if #frames > flashbacklength * 60 then
+       table.remove(frames, 1)
+   end
+
+   if allowinput and not self.canrevert then
+       self.canrevert = true
+   end
+
+   if self.lastinput then
+       hum.PlatformStand = false
+       self.lastinput = false
+   end
+
+   table.insert(frames, {
+       hrp.CFrame,
+       hrp.Velocity,
+       hum:GetState(),
+       hum.PlatformStand,
+       char:FindFirstChildOfClass("Tool")
+   })
+end
+
+function flashback:Revert(char, hrp, hum)
+   if not char or not hrp or not hum or #frames == 0 or not self.canrevert then
+       self.canrevert = false
+       self:Advance(char, hrp, hum)
+       return
+   end
+
+   local num = #frames
+   for i = 1, flashbackspeed do
+       table.remove(frames, num)
+       num = num - 1
+   end
+   
+   self.lastinput = true
+   local lastframe = frames[num]
+   table.remove(frames, num)
+   hrp.CFrame = lastframe[1]
+   hrp.Velocity = -lastframe[2]
+   hum:ChangeState(lastframe[3])
+   hum.PlatformStand = lastframe[4] 
+   
+   local currenttool = char:FindFirstChildOfClass("Tool")
+   if lastframe[5] then
+       if not currenttool then
+           hum:EquipTool(lastframe[5])
+       end
+   else
+       hum:UnequipTools()
+   end
+end
+
+local function step()
+   local char = getchar()
+   local hrp = gethrp(char)
+   local hum = char and char:FindFirstChildWhichIsA("Humanoid")
+   if not char or not hrp or not hum then return end
+   
+   if uis:IsKeyDown(Enum.KeyCode[key]) then
+       flashback:Revert(char, hrp, hum)
+   else
+       flashback:Advance(char, hrp, hum, true)
+   end
+   
+   if uis:IsKeyDown(Enum.KeyCode[killKey]) then
+       RS:UnbindFromRenderStep(name)
+       script:Destroy()
+   end
+end
+
+pcall(function()
+   RS:BindToRenderStep(name, 1, step)
+end)
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Midnight Mode",
+   Callback = function()
+ local Lighting = game:GetService("Lighting")
+
+Lighting.ClockTime = 24
+Lighting.Ambient = Color3.fromRGB(50, 50, 50)
+Lighting.OutdoorAmbient = Color3.fromRGB(50, 50, 50)
+Lighting.FogColor = Color3.fromRGB(0, 0, 0)
+Lighting.FogEnd = 500
+Lighting.Brightness = 1.0
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Anti AFK (Credits: Zynlope - proxycat)",
+   Callback = function()
+       local antiAFK = false
+ antiAFK = not antiAFK
+       if antiAFK then
+           local player = game.Players.LocalPlayer
+           local playerHeadIcon = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+
+           game.StarterGui:SetCore("SendNotification", {
+               Title = "Anti AFK",
+               Text = "Anti-AFK habilitado (enabled)",
+               Icon = playerHeadIcon,
+               Duration = 3,
+               Button1 = "ok"
+           })
+           local vu = game:GetService("VirtualUser")
+           game.Players.LocalPlayer.Idled:Connect(function()
+               vu:CaptureController()
+               vu:ClickButton2(Vector2.new(0, 0))
+           end)
+       else
+           local player = game.Players.LocalPlayer
+           local playerHeadIcon = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+           game.StarterGui:SetCore("SendNotification", {
+               Title = "Anti AFK",
+               Text = "Anti-AFK desabilitado (disabled) (requer reinício para resetar conexão Idled)",
+               Icon = playerHeadIcon,
+               Duration = 3,
+               Button1 = "ok"
+           })
+       end
+   end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Wall Jump / Player Jump",
+   Callback = function()
+local wallJumpForce = Vector3.new(0, -70, -70) -- The direction and power of the wall jump
+local wallDetectionDistance = 3 -- Distance to detect walls
+local cooldownTime = 0 -- Cooldown between wall jumps (in seconds)
+
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+local rootPart = character:WaitForChild("HumanoidRootPart")
+local canWallJump = true
+
+local function isNearWall()
+    local rayParams = RaycastParams.new()
+    rayParams.FilterDescendantsInstances = {character}
+    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
+
+    local directions = {
+        Vector3.new(1, 0, 0),  -- Right
+        Vector3.new(-1, 0, 0), -- Left
+        Vector3.new(0, 0, 1),  -- Forward
+        Vector3.new(0, 0, -1)  -- Backward
+    }
+
+    for _, dir in ipairs(directions) do
+        local ray = workspace:Raycast(rootPart.Position, dir * wallDetectionDistance, rayParams)
+        if ray then
+            return ray
+        end
+    end
+
+    return nil
+end
+
+local function wallJump()
+    if not canWallJump then return end
+
+    local wallRay = isNearWall()
+    if wallRay then
+        canWallJump = false
+
+        local jumpDirection = wallRay.Normal * wallJumpForce.Magnitude
+        rootPart.Velocity = Vector3.new(jumpDirection.X, wallJumpForce.Y, jumpDirection.Z)
+
+        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+
+        wait(cooldownTime)
+        canWallJump = true
+    end
+end
+
+game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed then return end
+
+    if input.KeyCode == Enum.KeyCode.Space then
+        wallJump()
+    end
+end)
+end,
+})
+
+getgenv().WalkSpeedValue = 25
+local BunnyHopActive = false
+local BunnyHopConnection
+
+local Player = game:GetService("Players").LocalPlayer
+local Humanoid = Player.Character:WaitForChild("Humanoid")
+
+Humanoid:GetPropertyChangedSignal("WalkSpeed"):Connect(function()
+    Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+end)
+Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+
+local Toggle = Tab:CreateToggle({
+    Name = "Bunny Hop (+0.5 speed every jump)",
+    CurrentValue = false,
+    Flag = "BunnyHopToggle",
+    Callback = function(Value)
+        BunnyHopActive = Value
+
+        if Value then
+            getgenv().WalkSpeedValue = 25
+            Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+
+            BunnyHopConnection = task.spawn(function()
+                while BunnyHopActive do
+                    if Humanoid.FloorMaterial ~= Enum.Material.Air then
+                        Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                        getgenv().WalkSpeedValue += 0.5
+                        Humanoid.WalkSpeed = getgenv().WalkSpeedValue
+                        task.wait(0.5)
+                    else
+                        task.wait(0.1)
+                    end
+                end
+            end)
+        else
+            getgenv().WalkSpeedValue = 25
+            Humanoid.WalkSpeed = 25
+        end
+    end,
+})
+
+
 local Tab = Window:CreateTab("nerdy stuff", 126133429358591) -- Title, Image
 
 local Players = game:GetService("Players")
@@ -1114,54 +1547,6 @@ local Button = Tab:CreateButton({
 local Tab = Window:CreateTab("skibidi stuff", 16365563022) -- Title, Image
 
 local Section = Tab:CreateSection("give people rods")
-local Button = Tab:CreateButton({
-   Name = "Anti AFK (Credits: Zynlope - proxycat)",
-   Callback = function()
-       local antiAFK = false
- antiAFK = not antiAFK
-       if antiAFK then
-           local player = game.Players.LocalPlayer
-           local playerHeadIcon = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-
-           game.StarterGui:SetCore("SendNotification", {
-               Title = "Anti AFK",
-               Text = "Anti-AFK habilitado (enabled)",
-               Icon = playerHeadIcon,
-               Duration = 3,
-               Button1 = "ok"
-           })
-           local vu = game:GetService("VirtualUser")
-           game.Players.LocalPlayer.Idled:Connect(function()
-               vu:CaptureController()
-               vu:ClickButton2(Vector2.new(0, 0))
-           end)
-       else
-           local player = game.Players.LocalPlayer
-           local playerHeadIcon = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
-           game.StarterGui:SetCore("SendNotification", {
-               Title = "Anti AFK",
-               Text = "Anti-AFK desabilitado (disabled) (requer reinício para resetar conexão Idled)",
-               Icon = playerHeadIcon,
-               Duration = 3,
-               Button1 = "ok"
-           })
-       end
-   end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Midnight Mode",
-   Callback = function()
- local Lighting = game:GetService("Lighting")
-
-Lighting.ClockTime = 24
-Lighting.Ambient = Color3.fromRGB(50, 50, 50)
-Lighting.OutdoorAmbient = Color3.fromRGB(50, 50, 50)
-Lighting.FogColor = Color3.fromRGB(0, 0, 0)
-Lighting.FogEnd = 500
-Lighting.Brightness = 1.0
-   end,
-})
 
 local Button = Tab:CreateButton({
    Name = "Enable Inventory",
@@ -1760,37 +2145,6 @@ RunService.Heartbeat:Connect(function()
         Humanoid.WalkSpeed = getgenv().WalkSpeedValue
     end
 end)
-
-local Toggle = Tab:CreateToggle({
-    Name = "Bunny Hop (+1 speed every jump)",
-    CurrentValue = false,
-    Flag = "BunnyHopToggle",
-    Callback = function(Value)
-        BunnyHopActive = Value
-
-        if Value then
-            getgenv().WalkSpeedValue = 25
-            Humanoid.WalkSpeed = getgenv().WalkSpeedValue
-
-            BunnyHopConnection = task.spawn(function()
-                while BunnyHopActive do
-                    if Humanoid.FloorMaterial ~= Enum.Material.Air then
-                        Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-                        getgenv().WalkSpeedValue += 1
-                        task.wait(0.5)
-                    else
-                        task.wait(0.1)
-                    end
-                end
-            end)
-        else
-            -- Stop Bunny Hop & set speed to 20
-            BunnyHopActive = false
-            getgenv().WalkSpeedValue = 25
-            Humanoid.WalkSpeed = 25
-        end
-    end,
-})
 
 local FlyToggle = Tab:CreateToggle({
     Name = "Fly/Unfly",
@@ -2834,164 +3188,6 @@ local Button = Tab:CreateButton({
 })
 
 local Button = Tab:CreateButton({
-   Name = "Chat Logger",
-   Callback = function()
-                          if game:service('RunService'):IsStudio() then print('!STUDIO!') else
-    if game:service('CoreGui'):findFirstChild('LogHolder') then return nil
-    end
-end
-
-local LogHolder = Instance.new("ScreenGui")
-local Logs = Instance.new("Frame")
-local Scroll = Instance.new("ScrollingFrame")
-local Template = Instance.new("TextLabel")
-
-LogHolder.Name = "LogHolder"
-if game:service('RunService'):IsStudio() then LogHolder.Parent = game.Players.LocalPlayer.PlayerGui else
-    LogHolder.Parent = game.CoreGui
-end
-
-Logs.Name = "Logs"
-Logs.Parent = LogHolder
-Logs.AnchorPoint = Vector2.new(0.5, 0.5)
-Logs.BackgroundColor3 = Color3.new(0, 0, 0)
-Logs.Position = UDim2.new(0.200000003, 0, 0.200000003, 0)
-Logs.Size = UDim2.new(0, 400, 0, 250)
-Logs.Style = Enum.FrameStyle.DropShadow
-
-Scroll.Name = "Scroll"
-Scroll.Parent = Logs
-Scroll.BackgroundColor3 = Color3.new(0, 0, 0)
-Scroll.BackgroundTransparency = 1
-Scroll.BorderSizePixel = 0
-Scroll.Size = UDim2.new(1, 0, 1, 0)
-Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-Scroll.ScrollBarThickness = 6
-
-Template.Name = "Template"
-Template.Parent = Logs
-Template.BackgroundColor3 = Color3.new(1, 1, 1)
-Template.BackgroundTransparency = 1
-Template.Position = UDim2.new(0, 0, 0, -25)
-Template.Size = UDim2.new(1, 0, 0, 20)
-Template.Font = Enum.Font.ArialBold
-Template.Text = ""
-Template.TextColor3 = Color3.new(1, 1, 1)
-Template.TextSize = 15
-Template.TextXAlignment = Enum.TextXAlignment.Left
-Template.TextWrap = true
-
-Logs.Active = true
-Logs.Draggable = true
-
-local loggedTable = {}
-
-local getTotalSize = function()
-local totalSize = UDim2.new(0, 0, 0, 0)
-    
-    for i, v in next, loggedTable do
-        totalSize = totalSize + UDim2.new(0, 0, 0, v.Size.Y.Offset)
-    end
-    
-    return totalSize
-end
-
-local BUD = UDim2.new(0, 0, 0, 0)
-local TotalNum = 0
-
-local function GenLog(txt, colo, time)
-    local oldColo = Color3.fromRGB(0, 0, 0) 
-    
-    local Temp = Template:Clone()
-    Temp.Parent = Scroll
-    Temp.Name = txt..'Logged'
-    Temp.Text = tostring(txt)
-    Temp.Visible = true
-    Temp.Position = BUD + UDim2.new(0, 0, 0, 0)
-    if colo then oldColo = colo Temp.TextColor3 = colo elseif not colo then Temp.TextColor3 = Color3.fromRGB(200, 200, 200) end
-    local timeVal = Instance.new('StringValue', Temp)
-    timeVal.Name = 'TimeVal'
-    timeVal.Value = time
-
-    TotalNum = TotalNum + 1
-    
-    if not Temp.TextFits then repeat Temp.Size = UDim2.new(Temp.Size.X.Scale, Temp.Size.X.Offset, Temp.Size.Y.Scale, Temp.Size.Y.Offset + 10)
-        Temp.Text = txt
-    until Temp.TextFits 
-end
-
-    BUD = BUD + UDim2.new(0, 0, 0, Temp.Size.Y.Offset)
-    
-    table.insert(loggedTable, Temp)
-    
-    local totSize = getTotalSize()
-    
-    if totSize.Y.Offset >= Scroll.CanvasSize.Y.Offset then Scroll.CanvasSize = UDim2.new(totSize.X.Scale, totSize.X.Offset, totSize.Y.Scale, totSize.Y.Offset + 100)
-    Scroll.CanvasPosition = Scroll.CanvasPosition + Vector2.new(0, totSize.Y.Offset) 
-    end
-    
-    return Temp
-end
-
-local ChatData = ""
-
-local function SaveToFile()
-    local t = os.date("*t")
-    local dateDat = t['hour']..' '..t['min']..' '..t['sec']..' '..t['day']..'.'..t['month']..'.'..t['year']
-    
-    ChatData = ""
-    
-    for i, v in pairs(Scroll:GetChildren()) do
-        ChatData = ChatData..v.TimeVal.Value..' '..v.Text..'\n'
-    end
-    
-    writefile('ChatLogs '..dateDat..'.txt', ChatData)
-end
-
-local function Clear()
-    loggedTable = {}
-    ChatData = ""
-    Scroll.CanvasPosition = Vector2.new(0, 0)
-    for i, v in pairs(Scroll:GetChildren()) do
-        v:Destroy()
-    end
-    Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    BUD = UDim2.new(0, 0, 0, 0)
-end
-
-local LogPlr = function(plr)
-            plr.Chatted:connect(function(msg)
-                
-            local t = os.date("*t")
-            local dateDat = t['hour']..':'..t['min']..':'..t['sec']
-    
-            if string.len(msg) >= 1000 then return nil end
-            if string.lower(msg) == 'clear' and plr == game:service('Players').LocalPlayer then Clear() return nil end
-            if string.lower(msg) == 'savetofile' and plr == game:service('Players').LocalPlayer then SaveToFile() return nil end
-            if string.sub(msg, 1, 1):match('%p') and string.sub(msg, 2, 2):match('%a') and string.len(msg) >= 5 then GenLog(plr.Name..': '..msg, Color3.new(255, 0, 0), dateDat) else
-            GenLog(plr.Name..': '..msg, Color3.new(255, 255, 255), dateDat)
-            end
-    end)
-end
-
-for i, v in pairs(game.Players:GetChildren()) do
-    LogPlr(v)
-end
-
-game.Players.PlayerAdded:connect(function(plr)
-    LogPlr(plr)
-end)
-   end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Firework fling (BUGGY)",
-   Callback = function()
-loadstring(game:HttpGet("https://raw.githubusercontent.com/rolezeay/fireworkfilng/refs/heads/main/hmmm"))()
-   end,
-})
-
-local Button = Tab:CreateButton({
    Name = "Remote spy (works for xeno/solara and more)",
    Callback = function()
 --[[
@@ -3017,179 +3213,6 @@ local Button = Tab:CreateButton({
    Callback = function()
       	   loadstring(game:HttpGet("https://pastefy.app/YZoglOyJ/raw"))()
    end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Load E to rewind character",
-   Callback = function()
-      local key = "E"
-local flashbacklength = 80
-local flashbackspeed = 1.5
-
-if not game:IsLoaded() then game.Loaded:Wait() end
-
-local name = "FlashbackSystem"
-local frames, uis, LP, RS = {}, game:GetService("UserInputService"), game:GetService("Players").LocalPlayer, game:GetService("RunService")
-
-local VRService = game:GetService("VRService")
-if VRService.VREnabled then return end
-
-game:GetService("StarterPlayer").DevComputerMovementMode = Enum.DevComputerMovementMode.KeyboardMouse
-game:GetService("StarterPlayer").DevTouchMovementMode = Enum.DevTouchMovementMode.Thumbstick
-
-if not LP or not uis then return end
-
-pcall(RS.UnbindFromRenderStep, RS, name)
-
-local function getchar()
-   return LP.Character or LP.CharacterAdded:Wait()
-end
-
-function gethrp(c)
-   return c and (c:FindFirstChild("HumanoidRootPart") or c.RootPart or c.PrimaryPart or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso") or c:FindFirstChildWhichIsA("BasePart"))
-end
-
-local flashback = { lastinput = false, canrevert = true }
-
-function flashback:Advance(char, hrp, hum, allowinput)
-   if not char or not hrp or not hum then return end
-   if #frames > flashbacklength * 60 then
-       table.remove(frames, 1)
-   end
-
-   if allowinput and not self.canrevert then
-       self.canrevert = true
-   end
-
-   if self.lastinput then
-       hum.PlatformStand = false
-       self.lastinput = false
-   end
-
-   table.insert(frames, {
-       hrp.CFrame,
-       hrp.Velocity,
-       hum:GetState(),
-       hum.PlatformStand,
-       char:FindFirstChildOfClass("Tool")
-   })
-end
-
-function flashback:Revert(char, hrp, hum)
-   if not char or not hrp or not hum or #frames == 0 or not self.canrevert then
-       self.canrevert = false
-       self:Advance(char, hrp, hum)
-       return
-   end
-
-   local num = #frames
-   for i = 1, flashbackspeed do
-       table.remove(frames, num)
-       num = num - 1
-   end
-   
-   self.lastinput = true
-   local lastframe = frames[num]
-   table.remove(frames, num)
-   hrp.CFrame = lastframe[1]
-   hrp.Velocity = -lastframe[2]
-   hum:ChangeState(lastframe[3])
-   hum.PlatformStand = lastframe[4] 
-   
-   local currenttool = char:FindFirstChildOfClass("Tool")
-   if lastframe[5] then
-       if not currenttool then
-           hum:EquipTool(lastframe[5])
-       end
-   else
-       hum:UnequipTools()
-   end
-end
-
-local function step()
-   local char = getchar()
-   local hrp = gethrp(char)
-   local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-   if not char or not hrp or not hum then return end
-   
-   if uis:IsKeyDown(Enum.KeyCode[key]) then
-       flashback:Revert(char, hrp, hum)
-   else
-       flashback:Advance(char, hrp, hum, true)
-   end
-   
-   if uis:IsKeyDown(Enum.KeyCode[killKey]) then
-       RS:UnbindFromRenderStep(name)
-       script:Destroy()
-   end
-end
-
-pcall(function()
-   RS:BindToRenderStep(name, 1, step)
-end)
-   end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Wall Jump",
-   Callback = function()
-local wallJumpForce = Vector3.new(0, -70, -70) -- The direction and power of the wall jump
-local wallDetectionDistance = 3 -- Distance to detect walls
-local cooldownTime = 0 -- Cooldown between wall jumps (in seconds)
-
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
-local rootPart = character:WaitForChild("HumanoidRootPart")
-local canWallJump = true
-
-local function isNearWall()
-    local rayParams = RaycastParams.new()
-    rayParams.FilterDescendantsInstances = {character}
-    rayParams.FilterType = Enum.RaycastFilterType.Blacklist
-
-    local directions = {
-        Vector3.new(1, 0, 0),  -- Right
-        Vector3.new(-1, 0, 0), -- Left
-        Vector3.new(0, 0, 1),  -- Forward
-        Vector3.new(0, 0, -1)  -- Backward
-    }
-
-    for _, dir in ipairs(directions) do
-        local ray = workspace:Raycast(rootPart.Position, dir * wallDetectionDistance, rayParams)
-        if ray then
-            return ray
-        end
-    end
-
-    return nil
-end
-
-local function wallJump()
-    if not canWallJump then return end
-
-    local wallRay = isNearWall()
-    if wallRay then
-        canWallJump = false
-
-        local jumpDirection = wallRay.Normal * wallJumpForce.Magnitude
-        rootPart.Velocity = Vector3.new(jumpDirection.X, wallJumpForce.Y, jumpDirection.Z)
-
-        humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
-
-        wait(cooldownTime)
-        canWallJump = true
-    end
-end
-
-game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
-    if gameProcessed then return end
-
-    if input.KeyCode == Enum.KeyCode.Space then
-        wallJump()
-    end
-end)
-end,
 })
 
 
