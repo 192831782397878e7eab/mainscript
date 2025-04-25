@@ -839,7 +839,7 @@ local Toggle = Tab:CreateToggle({
     end,
 })
 local Tab = Window:CreateTab("bypasser", 78656669261642) -- Title, Image
-local Section = Tab:CreateSection("chat bypasser lol")
+local Section = Tab:CreateSection("WARNING: Set your account language to Қазақ Тілі for this to work.")
 local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
@@ -883,6 +883,13 @@ local Input = Tab:CreateInput({
             wait(0)
         end
     end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Unban voice chat",
+   Callback = function()
+game:GetService("VoiceChatService"):joinVoice()
+ end,
 })
 
 local Button = Tab:CreateButton({
