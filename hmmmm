@@ -30,6 +30,18 @@ local randomGreeting = greetings[math.random(1, #greetings)]
 local playerName = Players.LocalPlayer.DisplayName
 
 local currentTime = os.date("%I:%M:%S %p")
+local TextChatService = game:GetService("TextChatService")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+local function sendMessage(message)
+    local textChannel = TextChatService:WaitForChild("TextChannels"):FindFirstChild("RBXGeneral")
+    if textChannel then
+        textChannel:SendAsync(message)
+    end
+end
+local customText = ""
+sendMessage(customText)
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zynlope/rayfield/refs/heads/main/hmmm'))() 
 local title = randomGreeting .. ", " .. playerName .. " - " .. currentTime
@@ -826,9 +838,96 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
+local Tab = Window:CreateTab("bypasser", 78656669261642) -- Title, Image
+local Section = Tab:CreateSection("chat bypasser lol")
+local TextChatService = game:GetService("TextChatService")
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+local function sendMessage(message)
+    local textChannel = TextChatService:WaitForChild("TextChannels"):FindFirstChild("RBXGeneral")
+    if textChannel then
+        textChannel:SendAsync(message)
+    end
+end
+
+local function transformText(inputText)
+    -- Replace the specific letters with transformed versions
+    local transformed = inputText:gsub("a", "а")
+    transformed = transformed:gsub("u", "u〪")
+    transformed = transformed:gsub("i", "i〪")
+    transformed = transformed:gsub("n", "ⴖ")
+    transformed = transformed:gsub("s", "ร")
+    
+    local words = {}
+    for word in transformed:gmatch("%S+") do
+        table.insert(words, word)
+    end
+    
+    return table.concat(words, "")
+end
+
+local Input = Tab:CreateInput({
+    Name = "Auto bypasser",
+    CurrentValue = "",
+    PlaceholderText = "message here",
+    RemoveTextAfterFocusLost = false,
+    Flag = "Input1",
+    Callback = function(Text)
+        local transformedText = transformText(Text)
+        local lines = {}
+        table.insert(lines, transformedText)
+
+        for _, line in ipairs(lines) do
+            sendMessage(line)
+            wait(0)
+        end
+    end,
+})
+
+local Button = Tab:CreateButton({
+   Name = "Rejoin",
+   Callback = function()
+ game:GetService("TeleportService"):Teleport(game.PlaceId)
+	 wait()
+ 
+ wait();
+ end,
+})
+
+local Section = Tab:CreateSection("premade messages")
+
+-- List of messages and their display names
+local messages = {
+    {name = "got discord?", message = "gotdisᲃord?"},
+    {name = "is this retard serious lmao 😭", message = "isthisꞅetardseriouslmao😭"},
+    {name = "sorry lil faggot not my business", message = "sorrylilfลggotnotmybusiness"},
+    {name = "kick that bitch nigger off the plane!!", message = "kickthatbi〪tchⴖiggerofftheplane!!"},
+    {name = "wanna hop on vc instead lil nigga?", message = "wannahoponvcinsteadlilⴖigga?"},
+    {name = "who wanna rape the lgbt fags with me?", message = "whowannarаpethelgbtfลgswithme?"},
+    {name = "u look retarded yet so rapeable..", message = "ulookꞅetardedyetsorаpeable.."},
+    {name = "whats the sauce of being this type of a dumbass?", message = "whatsthesauceofbeingthistypeofadum〪baรร?"}
+}
+
+local function sendMessage(message)
+    local TextChatService = game:GetService("TextChatService")
+    local textChannel = TextChatService:WaitForChild("TextChannels"):FindFirstChild("RBXGeneral")
+    if textChannel then
+        textChannel:SendAsync(message)
+    end
+end
+
+for _, msg in pairs(messages) do
+    Tab:CreateButton({
+        Name = msg.name,
+        Callback = function()
+            sendMessage(msg.message)
+        end,
+    })
+end
 
 
-local Tab = Window:CreateTab("nerdy stuff", 126133429358591) -- Title, Image
+local Tab = Window:CreateTab("nerdy stuff", 126133429358591)
 
 local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
