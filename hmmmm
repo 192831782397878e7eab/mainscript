@@ -31,15 +31,14 @@ local playerName = Players.LocalPlayer.DisplayName
 
 local currentTime = os.date("%I:%M:%S %p")
 
-local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))() 
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zynlope/rayfield/refs/heads/main/hmmm'))() 
 local title = randomGreeting .. ", " .. playerName .. " - " .. currentTime
 
 local Window = Rayfield:CreateWindow({
    Name = title,
-   Icon = 0,
+   Icon = 85391913891710,
    LoadingTitle = "zynlope rewrite",
    LoadingSubtitle = "discord: plusgiant",
-   Theme = "Default",
 
    DisableRayfieldPrompts = false,
    DisableBuildWarnings = false,
@@ -65,8 +64,50 @@ local Window = Rayfield:CreateWindow({
       SaveKey = false,
       GrabKeyFromSite = false,
       Key = {"ngtotheng"}
+   },
+
+   Theme = {
+      TextColor = Color3.fromRGB(240, 240, 240),
+      Background = Color3.fromRGB(15, 15, 15),
+      Topbar = Color3.fromRGB(13, 13, 13),
+      Shadow = Color3.fromRGB(20, 20, 20),
+
+      NotificationBackground = Color3.fromRGB(15, 15, 15),
+      NotificationActionsBackground = Color3.fromRGB(230, 230, 230),
+
+      TabBackground = Color3.fromRGB(20, 20, 20),
+      TabStroke = Color3.fromRGB(85, 85, 85),
+      TabBackgroundSelected = Color3.fromRGB(255, 163, 163),
+      TabTextColor = Color3.fromRGB(240, 240, 240),
+      SelectedTabTextColor = Color3.fromRGB(40, 40, 40),
+
+      ElementBackground = Color3.fromRGB(20, 20, 20),
+      ElementBackgroundHover = Color3.fromRGB(30, 30, 30),
+      SecondaryElementBackground = Color3.fromRGB(25, 25, 25),
+      ElementStroke = Color3.fromRGB(38, 38, 38),
+      SecondaryElementStroke = Color3.fromRGB(40, 40, 40),
+            
+      SliderBackground = Color3.fromRGB(50, 138, 220),
+      SliderProgress = Color3.fromRGB(50, 138, 220),
+      SliderStroke = Color3.fromRGB(58, 163, 255),
+
+      ToggleBackground = Color3.fromRGB(18, 18, 18),
+      ToggleEnabled = Color3.fromRGB(255, 163, 163),
+      ToggleDisabled = Color3.fromRGB(100, 100, 100),
+      ToggleEnabledStroke = Color3.fromRGB(69, 69, 69),
+      ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
+      ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
+      ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
+
+      DropdownSelected = Color3.fromRGB(20, 20, 20),
+      DropdownUnselected = Color3.fromRGB(30, 30, 30),
+
+      InputBackground = Color3.fromRGB(20, 20, 20),
+      InputStroke = Color3.fromRGB(65, 65, 65),
+      PlaceholderColor = Color3.fromRGB(178, 178, 178)
    }
 })
+
 
 
 local Tab = Window:CreateTab("main", 4483362458) -- Title, Image
