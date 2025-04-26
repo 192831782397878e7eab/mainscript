@@ -856,34 +856,6 @@ local Input = Tab:CreateInput({
     end,
 })
 
-local Input = Tab:CreateInput({
-    Name = "Bypass copier (for whispers)",
-    CurrentValue = "",
-    PlaceholderText = "message here",
-    RemoveTextAfterFocusLost = true,
-    Flag = "Input2",
-    Callback = function(Text)
-        local transformedText = transformText(Text)
-
-        if setclipboard then
-            setclipboard(transformedText)
-        elseif toclipboard then
-            toclipboard(transformedText)
-        else
-            warn("Clipboard function not available.")
-        end
-
-        -- Send a notification after copying
-        Rayfield:Notify({
-            Title = "Bypass Copier",
-            Content = "Bypassed version of your text is copied.\nYou can now send it to someone in whispers.",
-            Duration = 6.5,
-            Image = 4483362458,
-        })
-    end,
-})
-
-
 local Button = Tab:CreateButton({
    Name = "Unban voice chat",
    Callback = function()
