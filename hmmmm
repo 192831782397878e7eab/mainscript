@@ -40,8 +40,6 @@ local function sendMessage(message)
         textChannel:SendAsync(message)
     end
 end
-local customText = ""
-sendMessage(customText)
 
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zynlope/rayfield/refs/heads/main/hmmm'))() 
 local title = randomGreeting .. ", " .. playerName .. " - " .. currentTime
