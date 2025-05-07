@@ -378,6 +378,62 @@ game.Players.PlayerRemoving:Connect(function(player)
     end
 end)
 
+local Button = Tab:CreateButton({
+   Name = "Make yourself slide",
+   Callback = function()
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
+
+local player = Players.LocalPlayer
+local char = player.Character or player.CharacterAdded:Wait()
+local hrp = char:WaitForChild("HumanoidRootPart")
+local hum = char:WaitForChild("Humanoid")
+
+local sliding = false
+local velocity = Vector3.zero
+local slideSpeed = 1
+
+for _, part in ipairs(char:GetDescendants()) do
+    if part:IsA("BasePart") then
+        part.CustomPhysicalProperties = PhysicalProperties.new(0.03, 0, 0, 0, 0)
+    end
+end
+
+RunService.Heartbeat:Connect(function()
+    if sliding then
+        local cam = workspace.CurrentCamera
+        local moveDir = Vector3.zero
+
+        if UIS:IsKeyDown(Enum.KeyCode.W) then moveDir += cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.S) then moveDir -= cam.CFrame.LookVector end
+        if UIS:IsKeyDown(Enum.KeyCode.A) then moveDir -= cam.CFrame.RightVector end
+        if UIS:IsKeyDown(Enum.KeyCode.D) then moveDir += cam.CFrame.RightVector end
+
+        moveDir = Vector3.new(moveDir.X, 0, moveDir.Z).Unit
+        if moveDir.Magnitude > 0 then
+            velocity = moveDir * slideSpeed
+        else
+            velocity *= 0.975
+        end
+
+        hrp.Velocity = Vector3.new(velocity.X, hrp.Velocity.Y, velocity.Z)
+    end
+end)
+
+UIS.InputBegan:Connect(function(input, gpe)
+    if gpe then return end
+    if input.KeyCode == Enum.KeyCode.LeftShift then
+        sliding = not sliding
+        if not sliding then
+            velocity = Vector3.zero
+        end
+    end
+end)
+
+   end,
+})
+
 local Section = Tab:CreateSection("fake coins (you can type text)")
 
 local Input = Tab:CreateInput({
