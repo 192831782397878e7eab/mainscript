@@ -869,28 +869,136 @@ local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
 
-local function sendMessage(message)
-    local textChannel = TextChatService:WaitForChild("TextChannels"):FindFirstChild("RBXGeneral")
-    if textChannel then
-        textChannel:SendAsync(message)
-    end
-end
+
+	local function containsSwearWord(word)
+		for swear in pairs(swearWords) do
+			if word:lower():find(swear, 1, true) then
+				return true
+			end
+		end
+		return false
+	end
+	
+	local lowercaseBypasses = {
+	["fucking"] = "fบcking",
+	["fuck"] = "fบck",
+    ["fucked"] = "fบcked",
+    ["fuckidy"] = "fบckidy",
+    ["niggerest"] = "ⴖiggerest",
+	["nigger"] = "ⴖigger",
+	["niggers"] = "ⴖiggers",
+	["nigga"] = "ⴖigga",
+	["niggas"] = "ⴖiggas",
+	["ass"] = "аรร",
+	["dumbass"] = "dบmbаรร",
+	["bitch"] = "bi〪tch",
+	["cunt"] = "cบnt",
+	["hoe"] = "һoe",
+	["hoes"] = "һoes",
+	["pussy"] = "pบssy",
+	["discord"] = "disִcord",
+	["shit"] = "shi〪t",
+	["raped"] = "rаped",
+	["rape"] = "rаpe",
+	["hitler"] = "hi〪tler",
+	["porn"] = "porⴖ",
+	["pornhub"] = "porⴖhub",
+	["dick"] = "diᲃk",
+	["dicks"] = "diᲃks",
+	["dildo"] = "dil〪do",
+	["dildos"] = "dil〪dos",
+	["kill"] = "kіll",
+	["yourself"] = "yoบrself",
+	["faggot"] = "fลggot",
+	["slut"] = "slบt",
+	["sex"] = "sеִx",
+	["cum"] = "cบm",
+	["boobs"] = "bоִоִbs",
+	["boob"] = "bоִоִb",
+	["lmao"] = "lmao",
+	["lmfao"] = "lmfao",
+	["suck"] = "sบck",
+	["sucker"] = "sบcker",
+	["dirty"] = "dіrty",
+	["fat"] = "fลt",
+	["raping"] = "rลping"
+}
+
+local uppercaseBypasses = {
+    ["FUCKING"] = "ꜰUCKING",
+	["FUCK"] = "ꜰUCK",
+    ["FUCKED"] = "ꜰUCKED",
+    ["FUCKIDY"] = "ꜰUCKIDY",
+    ["BITCH"] = "BI〪TCH",
+    ["ASS"] = "AS〪S",
+    ["NIGGA"] = "NI〪GGA",
+	["NIGGAS"] = "NI〪GGAS",
+    ["NIGGER"] = "NI〪GGER",
+    ["NIGGEREST"] = "NI〪GGEREST",
+	["NIGGERS"] = "NI〪GGERS",
+    ["HOE"] = "HOE",
+	["HOES"] = "HOES",
+    ["CUNT"] = "CUN〪T",
+	["DICK"] = "DI〪CK",
+	["HITLER"] = "HI〪TLER",
+	["PORN"] = "POR〪N",
+	["RAPING"] = "RАPI〪NG",
+	["RAPED"] = "RАPED",
+	["RAPE"] = "RАPE",
+	["FAGGOT"] = "ꜰAGGOT",
+	["DISCORD"] = "DISִCORD",
+	["SLUT"] = "SL〪UT",
+	["SEX"] = "SЕִX",
+	["LMAO"] = "LMAO",
+	["LMFAO"] = "LMFAO",
+	["DIRTY"] = "DІRTY",
+    ["PUSSY"] = "Р〪USSY"
+}
 
 local function transformText(inputText)
-    -- Replace the specific letters with transformed versions
-    local transformed = inputText:gsub("a", "а")
-    transformed = transformed:gsub("u", "u〪")
-    transformed = transformed:gsub("i", "i〪")
-    transformed = transformed:gsub("n", "ⴖ")
-    transformed = transformed:gsub("s", "ร")
-    
-    local words = {}
-    for word in transformed:gmatch("%S+") do
-        table.insert(words, word)
+    local transformedWords = {}
+
+    for word in inputText:gmatch("%S+") do
+        local cleaned = word:gsub("%p", "")
+        local lowered = cleaned:lower()
+        local replacedWord = word
+        local found = false
+
+        for bad, bypass in pairs(lowercaseBypasses) do
+            local startIndex, endIndex = lowered:find(bad, 1, true)
+            if startIndex then
+                -- Replace the matched part while preserving the rest
+                replacedWord = cleaned:sub(1, startIndex - 1) .. bypass .. cleaned:sub(endIndex + 1)
+                found = true
+                break
+            end
+        end
+
+        if not found then
+            for bad, bypass in pairs(uppercaseBypasses) do
+                local loweredBad = bad:lower()
+                local startIndex, endIndex = lowered:find(loweredBad, 1, true)
+                if startIndex then
+                    replacedWord = cleaned:sub(1, startIndex - 1) .. bypass .. cleaned:sub(endIndex + 1)
+                    found = true
+                    break
+                end
+            end
+        end
+
+        table.insert(transformedWords, replacedWord)
     end
-    
-    return table.concat(words, "")
+
+    return table.concat(transformedWords, "")
 end
+
+	
+	local function sendMessage(message)
+		local channel = TextChatService:WaitForChild("TextChannels"):FindFirstChild("RBXGeneral")
+		if channel then
+			channel:SendAsync(message)
+		end
+	end
 
 local Input = Tab:CreateInput({
     Name = "Auto bypasser",
