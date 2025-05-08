@@ -118,12 +118,84 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-
-
 local Tab = Window:CreateTab("main", 4483362458) -- Title, Image
 local Section = Tab:CreateSection("change some settings for meepcity here.")
 local StarterGui = game:GetService("StarterGui")
 local savedObjects = {}
+
+local Players = game:GetService("Players")
+local player = Players.LocalPlayer
+
+local character = player.Character or player.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
+
+local jorkin = false
+local track = nil
+
+local function isR15(char)
+    return char and char:FindFirstChildOfClass("Humanoid") and char:FindFirstChildOfClass("Humanoid").RigType == Enum.HumanoidRigType.R15
+end
+
+local anim = Instance.new("Animation")
+anim.AnimationId = isR15(character) and "rbxassetid://698251653" or "rbxassetid://72042024"
+
+local function stopAnimation()
+    jorkin = false
+    if track then
+        track:Stop()
+        track = nil
+    end
+end
+
+local function playAnimationLoop()
+    if not humanoid then return end
+    if not track then
+        track = humanoid:LoadAnimation(anim)
+    end
+    jorkin = true
+    while jorkin do
+        if not track then break end
+        track:Play()
+        track:AdjustSpeed(isR15(character) and 0.7 or 0.65)
+        track.TimePosition = 0.6
+        task.wait(0.1)
+        while track and track.TimePosition < (isR15(character) and 0.7 or 0.65) and jorkin do
+            task.wait(0.1)
+        end
+        if track then
+            track:Stop()
+        end
+    end
+end
+
+player.CharacterAdded:Connect(function(newCharacter)
+    character = newCharacter
+    humanoid = character:WaitForChild("Humanoid")
+
+    humanoid.Died:Connect(stopAnimation)
+
+    anim.AnimationId = isR15(character) and "rbxassetid://698251653" or "rbxassetid://72042024"
+
+    if jorkin then
+        task.wait(1)
+        task.spawn(playAnimationLoop)
+    end
+end)
+
+humanoid.Died:Connect(stopAnimation)
+
+local Toggle = Tab:CreateToggle({
+    Name = "Jerk Off",
+    CurrentValue = false,
+    Flag = "Toggle_JerkOff",
+    Callback = function(Value)
+        if Value then
+            task.spawn(playAnimationLoop)
+        else
+            stopAnimation()
+        end
+    end,
+})
 
 local Toggle = Tab:CreateToggle({
     Name = "Clean Backyard (less lag)",
@@ -210,7 +282,6 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
-
 
 local Toggle = Tab:CreateToggle({
    Name = "Spoof PLUS/BOOMBOX/CANDYPACK",
@@ -3384,7 +3455,6 @@ local moreScripts = {
     {name = "Nameless Admin", url = "https://raw.githubusercontent.com/FilteringEnabled/NamelessAdmin/main/Source"},
     {name = "Remote spy (works for xeno/solara and more)", url = "https://raw.githubusercontent.com/InfernusScripts/Octo-Spy/refs/heads/main/Main.lua"},
     {name = "Dex", url = "https://raw.githubusercontent.com/infyiff/backup/main/dex.lua"},
-    {name = "Jerk off tool (Do enable inventory first)", url = "https://pastefy.app/YZoglOyJ/raw"},
     {name = "Invisibility", url = "https://pastebin.com/raw/3Rnd9rHf"},
     {name = "R15 Animations GUI", url = "https://pastebin.com/raw/5HNpk2yN"},
     {name = "R15 Animations GUI 2", url = "https://raw.githubusercontent.com/ExploitFin/AquaMatrix/refs/heads/AquaMatrix/AquaMatrix"},
