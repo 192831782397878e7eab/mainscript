@@ -1456,41 +1456,47 @@ local Toggle = Tab:CreateToggle({
    end,
 })
 
-local spawnFirework = false -- Variable to track toggle state
-local fireworkConnection -- Variable to hold the loop connection
-local lastFireworkTime = 0 -- Time of the last firework spawn
-local fireworkCooldown = 1.2 -- Cooldown between fireworks in seconds (adjust as needed)
+-- Services
+ local running = false
+    local loopThread
+    local steppedConnection
+    local Connection = ReplicatedStorage:WaitForChild("Connection")
+    local ConnectionEvent = ReplicatedStorage:WaitForChild("ConnectionEvent")
+    local RunService = game:GetService("RunService")
 
-local Toggle = Tab:CreateToggle({
-   Name = "Multi Spam Fireworks (Best)",
-   CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
-   Callback = function(value)
- spawnFirework = value
-        if spawnFirework then
-            -- Start continuously spawning fireworks
-            fireworkConnection = game:GetService("RunService").Heartbeat:Connect(function()
-                -- Check if enough time has passed since the last firework spawn
-                if tick() - lastFireworkTime >= fireworkCooldown then
-                    -- Fire the events to spawn fireworks
-                    game:GetService("ReplicatedStorage").Connection:InvokeServer(202, 1310)
-                    game:GetService("ReplicatedStorage").Connection:InvokeServer(201, 1310, {})
-                    game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(210)
-                    
-                    -- Update the last firework spawn time
-                    lastFireworkTime = tick()
+    local function fireworkV2()
+        while running do
+            Connection:InvokeServer(202, 1310, {Position = Vector3.new(0, -15, 100)})
+            Connection:InvokeServer(201, 1310, {})
+            task.wait(1.5)
+        end
+    end
+
+    Tab:CreateToggle({
+        Name = "Multi Spam Fireworks (Best)",
+        CurrentValue = false,
+        Flag = "Toggle1",
+        Callback = function(value)
+            running = value
+
+            if running then
+                loopThread = task.spawn(function()
+                    fireworkV2()
+                end)
+
+                steppedConnection = RunService.Stepped:Connect(function()
+                    if running then
+                        ConnectionEvent:FireServer(210)
+                    end
+                end)
+            else
+                if steppedConnection then
+                    steppedConnection:Disconnect()
+                    steppedConnection = nil
                 end
-            end)
-        else
-            -- Stop spawning fireworks
-            if fireworkConnection then
-                fireworkConnection:Disconnect()
-                fireworkConnection = nil
             end
         end
-   end,
-})
-
+    })
 local animationTrack
 
 local Toggle = Tab:CreateToggle({
