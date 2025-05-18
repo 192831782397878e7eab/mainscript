@@ -2069,7 +2069,7 @@ local conn = rs:WaitForChild("Connection")
 local connEvent = rs:WaitForChild("ConnectionEvent")
 
 local running = false
-local steppedConn, spinConn
+local steppedConn, spinObj
 
 function equipAllTools()
     for _, tool in pairs(bp:GetChildren()) do
@@ -2118,11 +2118,30 @@ end
 function startSpin()
     local hrp = char:FindFirstChild("HumanoidRootPart")
     if not hrp then return end
-    spinConn = runService.Heartbeat:Connect(function()
-        if running and hrp then
-            hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(20), 0)
+
+    for _, v in pairs(hrp:GetChildren()) do
+        if v.Name == "Spinning" then
+            v:Destroy()
         end
-    end)
+    end
+
+    spinObj = Instance.new("BodyAngularVelocity")
+    spinObj.Name = "Spinning"
+    spinObj.Parent = hrp
+    spinObj.MaxTorque = Vector3.new(0, math.huge, 0)
+    spinObj.AngularVelocity = Vector3.new(0, 20, 0)
+end
+
+function stopSpin()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+
+    for _, v in pairs(hrp:GetChildren()) do
+        if v.Name == "Spinning" then
+            v:Destroy()
+        end
+    end
+    spinObj = nil
 end
 
 Tab:CreateToggle({
@@ -2142,10 +2161,11 @@ Tab:CreateToggle({
             end)
         else
             if steppedConn then steppedConn:Disconnect() steppedConn = nil end
-            if spinConn then spinConn:Disconnect() spinConn = nil end
+            stopSpin()
         end
     end
 })
+
 
 local player = game.Players.LocalPlayer
 local character = player.Character or player.CharacterAdded:Wait()
