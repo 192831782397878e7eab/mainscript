@@ -118,7 +118,7 @@ local Window = Rayfield:CreateWindow({
    }
 })
 
-local Tab = Window:CreateTab("main", 4483362458) -- Title, Image
+local Tab = Window:CreateTab("main", 4483362458) 
 local Section = Tab:CreateSection("change some settings for meepcity here.")
 local StarterGui = game:GetService("StarterGui")
 local savedObjects = {}
@@ -214,8 +214,8 @@ local Toggle = Tab:CreateToggle({
         end
 
         if Value then
-            -- Toggle ON: Delete everything except the allowed ones
-            savedObjects = {} -- Clear previous data just in case
+            
+            savedObjects = {} 
             for _, obj in ipairs(vw:GetChildren()) do
                 if not (obj.Name == "1" or obj.Name == "2" or obj.Name == "3" or obj.Name == "BoomBox") then
                     table.insert(savedObjects, obj:Clone())
@@ -229,7 +229,7 @@ local Toggle = Tab:CreateToggle({
                 Duration = 3
             })
         else
-            -- Toggle OFF: Restore the saved objects
+            
             for _, obj in ipairs(savedObjects) do
                 obj.Parent = vw
             end
@@ -253,7 +253,7 @@ local Toggle = Tab:CreateToggle({
     Flag = "Toggle1",
     Callback = function(Value)
         if Value then
-            -- Toggle ON: Delete all Sound instances inside Boomboxes
+            
             local vw = workspace:FindFirstChild("VW")
             if vw then
                 for _, item in pairs(vw:GetDescendants()) do
@@ -263,7 +263,7 @@ local Toggle = Tab:CreateToggle({
                             if sound then
                                 table.insert(mutedBoomboxes, {
                                     parent = item,
-                                    sound = sound:Clone() -- Save the sound in case toggle is turned off later
+                                    sound = sound:Clone() 
                                 })
                                 sound:Destroy()
                             end
@@ -272,13 +272,13 @@ local Toggle = Tab:CreateToggle({
                 end
             end
         else
-            -- Toggle OFF: Restore previously muted boombox sounds
+            
             for _, data in pairs(mutedBoomboxes) do
                 if data.parent and data.parent:IsDescendantOf(workspace) then
                     data.sound.Parent = data.parent
                 end
             end
-            mutedBoomboxes = {} -- Clear saved data
+            mutedBoomboxes = {} 
         end
     end,
 })
@@ -308,7 +308,7 @@ local Toggle = Tab:CreateToggle({
        toggleEnabled = Value
        
        if toggleEnabled then
-           -- Function to remove all existing Sparklers
+           
            local function removeSparklers()
                for _, obj in ipairs(workspace:GetDescendants()) do
                    if obj:IsA("Model") or obj:IsA("Part") then
@@ -319,17 +319,17 @@ local Toggle = Tab:CreateToggle({
                end
            end
            
-           -- Initial cleanup
+           
            removeSparklers()
            
-           -- Connect to DescendantAdded event
+           
            connection = workspace.DescendantAdded:Connect(function(obj)
                if obj.Name == "Sparkler" then
                    obj:Destroy()
                end
            end)
        else
-           -- Disconnect event to stop detection
+           
            if connection then
                connection:Disconnect()
                connection = nil
@@ -353,12 +353,12 @@ local Toggle = Tab:CreateToggle({
        end
 
        if Value then
-           -- Remove the door and save data
+           
            if door then
                _G.SavedDoor = {
                    Parent = door.Parent,
-                   Position = door:GetPivot(), -- Save position and orientation
-                   Clone = door:Clone() -- Store a clone of the door
+                   Position = door:GetPivot(), 
+                   Clone = door:Clone() 
                }
                door:Destroy()
                print("NewDoorObject deleted and saved.")
@@ -366,11 +366,11 @@ local Toggle = Tab:CreateToggle({
                print("NewDoorObject not found.")
            end
        else
-           -- Restore the door
+           
            if _G.SavedDoor and _G.SavedDoor.Clone then
                local restoredDoor = _G.SavedDoor.Clone
                restoredDoor.Parent = _G.SavedDoor.Parent
-               restoredDoor:PivotTo(_G.SavedDoor.Position) -- Restore position and orientation
+               restoredDoor:PivotTo(_G.SavedDoor.Position) 
                print("NewDoorObject restored.")
            else
                print("No saved door to restore.")
@@ -382,14 +382,14 @@ local Toggle = Tab:CreateToggle({
 local isRealTimePlayerCountEnabled = false
 local playerCountNotification = nil
 
--- Function to update the player count notification
+
 local function updatePlayerCountNotification()
     if isRealTimePlayerCountEnabled then
         local playerCount = #game.Players:GetPlayers()
         game.StarterGui:SetCore("SendNotification", {
             Title = "Player Count",
             Text = "There are currently " .. playerCount .. " players in the game.",
-            Icon = "rbxassetid://130225201432137",  -- Custom icon if needed
+            Icon = "rbxassetid://130225201432137",  
             Duration = 5
         })
     end
@@ -399,32 +399,32 @@ end
 local Toggle = Tab:CreateToggle({
    Name = "Real time player count in server",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(value)
   isRealTimePlayerCountEnabled = value
 
-        -- If toggled on, update notifications in real-time
+        
         if isRealTimePlayerCountEnabled then
-            -- Check player count initially
+            
             updatePlayerCountNotification()
 
-            -- Listen to player joining or leaving
+            
             game.Players.PlayerAdded:Connect(function(player)
                 if isRealTimePlayerCountEnabled then
-                    updatePlayerCountNotification()  -- Update player count when a player joins
+                    updatePlayerCountNotification()  
                 end
             end)
 
             game.Players.PlayerRemoving:Connect(function(player)
                 if isRealTimePlayerCountEnabled then
-                    updatePlayerCountNotification()  -- Update player count when a player leaves
+                    updatePlayerCountNotification()  
                 end
             end)
         end
    end,
 })
 
--- Player Join/Leave Notifications
+
 game.Players.PlayerAdded:Connect(function(player)
     if isRealTimePlayerCountEnabled then
         local playerHeadIcon = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
@@ -514,7 +514,7 @@ local Input = Tab:CreateInput({
    RemoveTextAfterFocusLost = false,
    Flag = "Input1",
    Callback = function(Value)
-      -- Set the coin amount text to whatever is typed (letters or numbers)
+      
       local text = tostring(Value)
 
       game:GetService("Players").LocalPlayer.PlayerGui.MainGui.CoinsContainer.Container.Amount.Text = text
@@ -532,7 +532,7 @@ local Button = Tab:CreateButton({
    end,
 })
 
-local Tab = Window:CreateTab("zynlope", 85391913891710) -- Title, Image
+local Tab = Window:CreateTab("zynlope", 85391913891710) 
 local Section = Tab:CreateSection("bullshit by me")
 
 local scripts = {
@@ -879,7 +879,7 @@ end)
     end},
 }
 
--- Now create the buttons dynamically
+
 for _, scriptInfo in ipairs(scripts) do
     Tab:CreateButton({
         Name = scriptInfo.name,
@@ -934,7 +934,7 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
-local Tab = Window:CreateTab("bypasser", 78656669261642) -- Title, Image
+local Tab = Window:CreateTab("bypasser", 78656669261642) 
 local Paragraph = Tab:CreateParagraph({Title = "WARNING:", Content = "Set your account language to Қазақ Тілі for every bypass to work."})
 local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
@@ -1040,7 +1040,7 @@ local function transformText(inputText)
         for bad, bypass in pairs(lowercaseBypasses) do
             local startIndex, endIndex = lowered:find(bad, 1, true)
             if startIndex then
-                -- Replace the matched part while preserving the rest
+                
                 replacedWord = cleaned:sub(1, startIndex - 1) .. bypass .. cleaned:sub(endIndex + 1)
                 found = true
                 break
@@ -1110,7 +1110,7 @@ local Button = Tab:CreateButton({
 
 local Section = Tab:CreateSection("premade messages")
 
--- List of messages and their display names
+
 local messages = {
     {name = "got discord?", message = "gotdisᲃord?"},
     {name = "is this retard serious lmao 😭", message = "isthisꞅetardseriouslmao😭"},
@@ -1147,7 +1147,7 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local Section = Tab:CreateSection("backyard teleporter")
 
--- Creating the input field for User ID
+
 local Input = Tab:CreateInput({
    Name = "Enter User ID",
    CurrentValue = "",
@@ -1155,12 +1155,12 @@ local Input = Tab:CreateInput({
    RemoveTextAfterFocusLost = false,
    Flag = "Input1",
    Callback = function(Text)
-      -- Store the User ID for later use
-      _G.StoredUserID = tonumber(Text) -- Convert to number
+      
+      _G.StoredUserID = tonumber(Text) 
    end,
 })
 
--- Creating the teleport button
+
 local Button = Tab:CreateButton({
    Name = "Teleport to backyard CREDITS: SEMNEXO",
    Callback = function()
@@ -1186,7 +1186,7 @@ local Button = Tab:CreateButton({
 
 local Players = game:GetService("Players")
 
--- TextBox for entering username
+
 local UsernameInput = Tab:CreateInput({
    Name = "Enter Username",
    CurrentValue = "",
@@ -1194,11 +1194,11 @@ local UsernameInput = Tab:CreateInput({
    RemoveTextAfterFocusLost = false,
    Flag = "UsernameInput",
    Callback = function(Text)
-      _G.StoredUsername = Text -- Store the entered username
+      _G.StoredUsername = Text 
    end,
 })
 
--- Button to get and copy the User ID
+
 local CopyButton = Tab:CreateButton({
    Name = "Get & Copy User ID",
    Callback = function()
@@ -1208,7 +1208,7 @@ local CopyButton = Tab:CreateButton({
          end)
 
          if success and userId then
-            setclipboard(tostring(userId)) -- Copy User ID to clipboard
+            setclipboard(tostring(userId)) 
             game.StarterGui:SetCore("SendNotification", {
                Title = "User ID Copied!",
                Text = "User ID: " .. userId,
@@ -1429,34 +1429,34 @@ local Button = Tab:CreateButton({
    end,
 })
 
-local spawnFirework = false -- Variable to track toggle state
-local fireworkLoop -- Variable to hold the loop thread
+local spawnFirework = false 
+local fireworkLoop 
 
 local Toggle = Tab:CreateToggle({
    Name = "Spawn Fireworks (Normal)",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(value)
    spawnFirework = value
 		if spawnFirework then
-			-- Start spawning fireworks in a loop
+			
 			fireworkLoop = coroutine.create(function()
 				while spawnFirework do
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(202, 1310)
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(201, 1310, {})
 					game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(210)
-					wait(1.5) -- Adjust the wait time if needed for a slower/faster spawn rate
+					wait(1.5) 
 				end
 			end)
 			coroutine.resume(fireworkLoop)
 		else
-			-- Stop spawning fireworks by breaking the loop
+			
 			spawnFirework = false
 		end
    end,
 })
 
--- Services
+
  local running = false
     local loopThread
     local steppedConnection
@@ -1752,32 +1752,32 @@ end)
 local Section = Tab:CreateSection("Balloon Spawner")
 
 local Dropdown = Tab:CreateDropdown({
-   Name = "Select balloon",  -- Balloon color dropdown
-   Options = {"Red", "Blue", "Green", "Purple", "White", "Heart"},  -- Color options
-   CurrentOption = {"Red"},  -- Default option
-   MultipleOptions = false,  -- Only one option can be selected
-   Flag = "BalloonColor",  -- Flag to identify the configuration
+   Name = "Select balloon",  
+   Options = {"Red", "Blue", "Green", "Purple", "White", "Heart"},  
+   CurrentOption = {"Red"},  
+   MultipleOptions = false,  
+   Flag = "BalloonColor",  
    Callback = function(Options)
-      -- Update the selected balloon color
+      
       selectedBalloonColor = Options[1]
       print("Selected balloon color: " .. selectedBalloonColor)
    end,
 })
 
 local Toggle = Tab:CreateToggle({
-   Name = "Start spawning balloon type",  -- Start balloon spawning toggle
-   CurrentValue = false,  -- Default value (false = not spawning)
-   Flag = "SpawnBalloons",  -- Flag to identify the configuration
+   Name = "Start spawning balloon type",  
+   CurrentValue = false,  
+   Flag = "SpawnBalloons",  
    Callback = function(Value)
-      -- Update the spawnBalloons state
+      
       spawnBalloons = Value
       print("Spawning balloons: " .. tostring(spawnBalloons))
 
       if spawnBalloons then
-         -- Start balloon spawning in a separate thread
+         
          task.spawn(function()
             while spawnBalloons do
-               -- Map the selected balloon color to the balloon IDs
+               
                local balloonID
                if selectedBalloonColor == "Red" then
                   balloonID = 1311
@@ -1790,10 +1790,10 @@ local Toggle = Tab:CreateToggle({
                elseif selectedBalloonColor == "White" then
                   balloonID = 1315
                elseif selectedBalloonColor == "Heart" then
-                  balloonID = 1039  -- Heart balloon ID
+                  balloonID = 1039  
                end
 
-               -- Spawn the selected balloon type
+               
                local args = {
                   [1] = 201,
                   [2] = balloonID,
@@ -1807,28 +1807,28 @@ local Toggle = Tab:CreateToggle({
                game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
                game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-               task.wait(0)  -- Wait before spawning the next balloon
+               task.wait(0)  
             end
          end)
       end
    end,
 })
 
-local spawnAllBalloons = false -- To control the toggle
+local spawnAllBalloons = false 
 
 local Toggle = Tab:CreateToggle({
    Name = "Spawn all balloons",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(Value)
-spawnAllBalloons = Value -- Update the toggle state
+spawnAllBalloons = Value 
 		print("Spawning all balloons: " .. tostring(spawnAllBalloons))
 
 		if spawnAllBalloons then
-			-- Start spawning all balloons in a separate thread
+			
 			task.spawn(function()
 				while spawnAllBalloons do
-					-- Spawn balloon with ID 1311
+					
 					local args = {
 						[1] = 201,
 						[2] = 1311,
@@ -1840,32 +1840,32 @@ spawnAllBalloons = Value -- Update the toggle state
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					-- Spawn balloon with ID 1312
+					
 					args[2] = 1312
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					-- Spawn balloon with ID 1313
+					
 					args[2] = 1313
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					-- Spawn balloon with ID 1314
+					
 					args[2] = 1314
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					-- Spawn balloon with ID 1315
+					
 					args[2] = 1315
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					-- Spawn balloon with ID 1039 (new addition)
+					
 					args[2] = 1039
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args))
 					game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-					task.wait(0) -- Wait before spawning the next set of balloons
+					task.wait(0) 
 				end
 			end)
 		end
@@ -1877,7 +1877,7 @@ local Section = Tab:CreateSection("Other")
 local Button = Tab:CreateButton({
    Name = "Wear all items (Rejoin to remove them)",
    Callback = function()
- -- Fire the events to spawn fireworks once
+ 
       local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 local function tryID(id)
@@ -1886,7 +1886,7 @@ local function tryID(id)
 end
 
 for id = 0, 8000 do
-    coroutine.wrap(tryID)(id)  -- Launch each ID attempt in a new coroutine
+    coroutine.wrap(tryID)(id)  
 end
    end,
 })
@@ -1903,7 +1903,7 @@ local Button = Tab:CreateButton({
    end,
 })
 
-local Tab = Window:CreateTab("skibidi stuff", 16365563022) -- Title, Image
+local Tab = Window:CreateTab("skibidi stuff", 16365563022) 
 
 local Section = Tab:CreateSection("give people rods")
 
@@ -1926,7 +1926,7 @@ local backpack = player:WaitForChild("Backpack")
 local function equipAllTools()
     for _, tool in pairs(backpack:GetChildren()) do
         if tool:IsA("Tool") then
-            tool.Parent = character -- Equip the tool
+            tool.Parent = character 
         end
     end
 end
@@ -1943,7 +1943,7 @@ local Workspace = game:GetService("Workspace")
 
 local function getItem()
     ReplicatedStorage.Connection:InvokeServer(9, 0)
-    wait(0.1) -- Short delay to ensure the server processes
+    wait(0.1) 
 
     ReplicatedStorage.Connection:InvokeServer(9, 1)
 
@@ -1954,7 +1954,7 @@ local function getItem()
     local ohNumber1 = 11
     local ohTable2 = {
         ["FishingPolePos"] = Workspace.TempFish.Position,
-        ["Power"] = math.random(), -- Randomize to avoid detection
+        ["Power"] = math.random(), 
         ["Face"] = Workspace.TempFish.Position,
         ["PlayerPos"] = Workspace.TempFish.Position,
         ["FishingZonePos"] = Vector3.new(-5.29345703, -18.0412292, 43.7173767),
@@ -1971,36 +1971,36 @@ local character = player.Character or player.CharacterAdded:Wait()
 local backpack = player:WaitForChild("Backpack")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
-local Toggle = false -- Default value for the toggle
+local Toggle = false 
 
--- Function to equip all tools
+
 local function equipAllTools()
     for _, tool in pairs(backpack:GetChildren()) do
         if tool:IsA("Tool") then
-            tool.Parent = character -- Equip the tool
+            tool.Parent = character 
         end
     end
 end
 
--- Function to attempt resetting conditions and getting the item
+
 local function getItem()
-    -- Try resetting the potential flag or triggering conditions
-    ReplicatedStorage.Connection:InvokeServer(9, 0) -- Reset or modify state
-    wait(0.1) -- Short delay to ensure the server processes
+    
+    ReplicatedStorage.Connection:InvokeServer(9, 0) 
+    wait(0.1) 
 
-    -- Attempt to invoke the server to get the item again
-    ReplicatedStorage.Connection:InvokeServer(9, 1) -- Actual request
+    
+    ReplicatedStorage.Connection:InvokeServer(9, 1) 
 
-    -- Additional item requests (if needed)
+    
     ReplicatedStorage.Connection:InvokeServer(49)
     ReplicatedStorage.Connection:InvokeServer(50)
     ReplicatedStorage.Connection:InvokeServer(51)
 
-    -- Detailed item request with table data
+    
     local ohNumber1 = 11
     local ohTable2 = {
         ["FishingPolePos"] = Workspace.TempFish.Position,
-        ["Power"] = math.random(), -- Randomize to avoid detection
+        ["Power"] = math.random(), 
         ["Face"] = Workspace.TempFish.Position,
         ["PlayerPos"] = Workspace.TempFish.Position,
         ["FishingZonePos"] = Vector3.new(-5.29345703, -18.0412292, 43.7173767),
@@ -2008,10 +2008,10 @@ local function getItem()
     ReplicatedStorage.Connection:InvokeServer(ohNumber1, ohTable2)
 end
 
--- Continuous loop to keep executing both functions using multiple spawns
+
 local function startFishing()
     while Toggle do
-        -- Spawn multiple simultaneous operations for performance boost
+        
         for _ = 1, 1 do
             spawn(function() 
                 equipAllTools()
@@ -2021,18 +2021,18 @@ local function startFishing()
                 getItem()
             end)
         end
-        wait(0) -- Wait for the next iteration
+        wait(0) 
     end
 end
 
 local Toggle = Tab:CreateToggle({
    Name = "Loop Equip FishingRods (No lag)",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(value)
   Toggle = value
         if Toggle then
-            startFishing() -- Start the combined lag actions
+            startFishing() 
         end
    end,
 })
@@ -2040,114 +2040,111 @@ local Toggle = Tab:CreateToggle({
 local Toggle = Tab:CreateToggle({
    Name = "Loop Drop Rods",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(value)
- isSpamming = value -- Update the toggle state
+ isSpamming = value 
         
         if isSpamming then
-            -- Start a loop to press Backspace
+            
             spawn(function()
                 while isSpamming do
-                    -- Simulate Backspace key press
+                    
                     game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
-                    wait(0) -- Delay between each drop, adjust as needed
+                    wait(0) 
                 end
             end)
         end
    end,
 })
 
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
+local player = game.Players.LocalPlayer
+local rs = game:GetService("ReplicatedStorage")
+local ws = game:GetService("Workspace")
+local runService = game:GetService("RunService")
+local vim = game:GetService("VirtualInputManager")
 
-local localPlayer = Players.LocalPlayer
-local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local char = player.Character or player.CharacterAdded:Wait()
+local bp = player:WaitForChild("Backpack")
+local conn = rs:WaitForChild("Connection")
+local connEvent = rs:WaitForChild("ConnectionEvent")
 
-local spinningToggle = false -- Default toggle state
-local activeSpinConnections = {} -- Stores active connections to stop them when toggled off
+local running = false
+local steppedConn, spinConn
 
--- Function to spin around a single player
-local function spinAroundPlayer(targetPlayer)
-    local rootPart = character:FindFirstChild("HumanoidRootPart")
-    if not rootPart then return end
-
-    local targetCharacter = targetPlayer.Character
-    if not targetCharacter then return end
-
-    local targetRoot = targetCharacter:FindFirstChild("HumanoidRootPart")
-    if not targetRoot then return end
-
-    local spinDuration = 2 -- Adjust as needed
-    local radius = 6 -- Distance from the player
-    local spinSpeed = 720 -- Rotation speed in degrees per second
-
-    local startTime = tick()
-    local connection
-
-    connection = RunService.Heartbeat:Connect(function()
-        if not spinningToggle then
-            connection:Disconnect()
-            return
+function equipAllTools()
+    for _, tool in pairs(bp:GetChildren()) do
+        if tool:IsA("Tool") then
+            tool.Parent = char
         end
+    end
+end
 
-        local elapsedTime = tick() - startTime
-        if elapsedTime > spinDuration then
-            connection:Disconnect()
-            return
+function getItem()
+    conn:InvokeServer(9, 0)
+    task.wait(0.1)
+    conn:InvokeServer(9, 1)
+    conn:InvokeServer(49)
+    conn:InvokeServer(50)
+    conn:InvokeServer(51)
+
+    conn:InvokeServer(11, {
+        FishingPolePos = ws.TempFish.Position,
+        Power = math.random(),
+        Face = ws.TempFish.Position,
+        PlayerPos = ws.TempFish.Position,
+        FishingZonePos = Vector3.new(-5.29345703, -18.0412292, 43.7173767)
+    })
+end
+
+function fireworkSpam()
+    while running do
+        conn:InvokeServer(202, 1310, {Position = Vector3.new(0, -15, 100)})
+        conn:InvokeServer(201, 1310, {})
+        task.wait(1.5)
+    end
+end
+
+function rodLoop()
+    while running do
+        task.spawn(equipAllTools)
+        task.spawn(getItem)
+        task.spawn(function()
+            vim:SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
+        end)
+        task.wait(0)
+    end
+end
+
+function startSpin()
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+    if not hrp then return end
+    spinConn = runService.Heartbeat:Connect(function()
+        if running and hrp then
+            hrp.CFrame = hrp.CFrame * CFrame.Angles(0, math.rad(20), 0)
         end
-
-        local angle = math.rad((elapsedTime * spinSpeed) % 360)
-        local offset = Vector3.new(math.cos(angle) * radius, 0, math.sin(angle) * radius)
-        local targetPosition = targetRoot.Position + offset
-
-        rootPart.CFrame = CFrame.new(targetPosition, targetRoot.Position)
     end)
-
-    -- Add the connection to the list of active connections
-    table.insert(activeSpinConnections, connection)
-    wait(spinDuration)
 end
 
--- Function to spin around all players
-local function spinAroundAllPlayers()
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= localPlayer then
-            pcall(function()
-                spinAroundPlayer(player)
-            end)
-        end
-    end
-end
-
--- Function to start spinning
-local function startSpinning()
-    while spinningToggle do
-        spinAroundAllPlayers()
-        wait(0.1) -- Slight delay to prevent overloading
-    end
-end
-
--- Function to stop spinning
-local function stopSpinning()
-    for _, connection in ipairs(activeSpinConnections) do
-        connection:Disconnect()
-    end
-    activeSpinConnections = {} -- Clear the list of active connections
-end
-
--- Create the toggle
-local SpinToggle = Tab:CreateToggle({
-    Name = "Spin Around Players",
+Tab:CreateToggle({
+    Name = "RAID SERVER (INCREASE PING)",
     CurrentValue = false,
-    Flag = "SpinToggle",
-    Callback = function(value)
-        spinningToggle = value
-        if spinningToggle then
-            spawn(startSpinning) -- Start spinning
+    Flag = "MegaToggleSpin",
+    Callback = function(val)
+        running = val
+        if running then
+            task.spawn(rodLoop)
+            task.spawn(fireworkSpam)
+            startSpin()
+            steppedConn = runService.Stepped:Connect(function()
+                if running then
+                    connEvent:FireServer(210)
+                end
+            end)
         else
-            stopSpinning() -- Stop spinning
+            if steppedConn then steppedConn:Disconnect() steppedConn = nil end
+            if spinConn then spinConn:Disconnect() spinConn = nil end
         end
-    end,
+    end
 })
 
 local player = game.Players.LocalPlayer
@@ -2155,13 +2152,13 @@ local character = player.Character or player.CharacterAdded:Wait()
 local backpack = player:WaitForChild("Backpack")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Workspace = game:GetService("Workspace")
-local Toggle = false -- Default value for the toggle
-local isSpamming = false -- Variable to track toggle state
+local Toggle = false 
+local isSpamming = false 
 
 local function equipAllTools()
     for _, tool in pairs(backpack:GetChildren()) do
         if tool:IsA("Tool") then
-            tool.Parent = character -- Equip the tool
+            tool.Parent = character 
         end
     end
 end
@@ -2179,7 +2176,7 @@ local function getItem()
     local ohNumber1 = 11
     local ohTable2 = {
         ["FishingPolePos"] = Workspace.TempFish.Position,
-        ["Power"] = math.random(), -- Randomize to avoid detection
+        ["Power"] = math.random(), 
         ["Face"] = Workspace.TempFish.Position,
         ["PlayerPos"] = Workspace.TempFish.Position,
         ["FishingZonePos"] = Vector3.new(-5.29345703, -18.0412292, 43.7173767),
@@ -2187,10 +2184,10 @@ local function getItem()
     ReplicatedStorage.Connection:InvokeServer(ohNumber1, ohTable2)
 end
 
--- Continuous loop to keep executing both functions using multiple spawns
+
 local function startFishing()
     while Toggle do
-        -- Spawn 15 simultaneous operations for maximum performance boost
+        
         for _ = 1, 1000 do
             spawn(function() 
                 equipAllTools()
@@ -2200,27 +2197,27 @@ local function startFishing()
                 getItem()
             end)
         end
-        wait(0) -- Wait for the next iteration
+        wait(0) 
     end
 end
 
 local Button = Tab:CreateButton({
    Name = "LAG SERVER",
    Callback = function()
- -- Start both actions simultaneously when the button is clicked
-        -- Activate Loop Drop All
+ 
+        
         isSpamming = true
         spawn(function()
             while isSpamming do
-                -- Simulate Backspace key press
+                
                 game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
-                wait(1) -- Delay between each drop, adjust as needed
+                wait(1) 
             end
         end)
 
-        -- Activate Ultimate Spam Equip Fishing Rod (LAG)
+        
         Toggle = true
-        startFishing() -- Start the combined lag actions
+        startFishing() 
    end,
 })
 
@@ -2284,13 +2281,13 @@ local Section = Tab:CreateSection("auto catch and sell fishes on playground")
 local Toggle = Tab:CreateToggle({
    Name = "Spoof PLUS",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(Value)
 if Value then
-			-- When toggle is ON
+			
 			game.Players.LocalPlayer:SetAttribute("PLUS", true)
 		else
-			-- When toggle is OFF
+			
 			game.Players.LocalPlayer:SetAttribute("PLUS", false)
 		end
    end,
@@ -2335,11 +2332,11 @@ local Button = Tab:CreateButton({
    Name = "Start Farming",
    Callback = function()
  while true do
-    -- Fire the ConnectionEvent with argument 10
+    
     local args1 = { [1] = 10 }
     game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(unpack(args1))
 
-    -- Invoke the Connection with argument 11 and a table of data
+    
     local args2 = {
         [1] = 11,
         [2] = {
@@ -2352,28 +2349,28 @@ local Button = Tab:CreateButton({
     }
     game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args2))
 
-    -- Invoke the Connection with argument 49
+    
     local args3 = { [1] = 49 }
     game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args3))
 
-    -- Fire the ConnectionEvent with argument 10 again
+    
     local args4 = { [1] = 10 }
     game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(unpack(args4))
 
-    -- Invoke the Connection with argument 50 to keep getting fish
+    
     local args5 = { [1] = 50 }
     game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args5))
 
-    -- Invoke the Connection with argument 51 to keep selling fish
+    
     local args6 = { [1] = 51 }
     game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args6))
 
-    -- Invoke the Connection with argument 9 and 23 to go to fishing place automatically
+    
     local args7 = { [1] = 9, [2] = 23 }
     game:GetService("ReplicatedStorage").Connection:InvokeServer(unpack(args7))
 
-    -- Pause for a very short time to avoid freezing the game
-    wait(0)  -- You can adjust this wait time if you want it to run faster/slower
+    
+    wait(0)  
 end
    end,
 })
@@ -2440,13 +2437,13 @@ local function sFLY()
     while FLYING do
         task.wait()
 
-        -- Get camera directions
+        
         local cam = workspace.CurrentCamera
         local forward = cam.CFrame.LookVector
         local right = cam.CFrame.RightVector
         local up = Vector3.new(0, 1, 0)
 
-        -- Calculate movement direction based on input
+        
         local moveDir = (forward * (CONTROL.F + CONTROL.B)) + (right * (CONTROL.R + CONTROL.L)) + (up * (CONTROL.E + CONTROL.Q))
         if moveDir.Magnitude > 0 then
             moveDir = moveDir.Unit
@@ -2459,7 +2456,7 @@ local function sFLY()
         BG.CFrame = cam.CFrame
     end
 
-    -- Cleanup
+    
     BG:Destroy()
     BV:Destroy()
     humanoid:ChangeState(Enum.HumanoidStateType.GettingUp)
@@ -2522,7 +2519,7 @@ local FlyToggle = Tab:CreateToggle({
     end,
 })
 
--- Cria o alternador com uma tecla
+
 local FlyKeybind = Tab:CreateKeybind({
     Name = "Fly keybind",
     CurrentKeybind = "F", 
@@ -2544,7 +2541,7 @@ local Input = Tab:CreateInput({
    RemoveTextAfterFocusLost = false,
    Flag = "Input1",
    Callback = function(Value)
-   getgenv().WalkSpeedValue = Value; --set your desired walkspeed here
+   getgenv().WalkSpeedValue = Value; 
 local Player = game:service'Players'.LocalPlayer;
 Player.Character.Humanoid:GetPropertyChangedSignal'WalkSpeed':Connect(function()
 Player.Character.Humanoid.WalkSpeed = getgenv().WalkSpeedValue;
@@ -2572,7 +2569,7 @@ local Input = Tab:CreateInput({
    RemoveTextAfterFocusLost = false,
    Flag = "Input1",
    Callback = function(Value)
- getgenv().JumpPowerValue = Value; --set your desired walkspeed here
+ getgenv().JumpPowerValue = Value; 
 local Player = game:service'Players'.LocalPlayer;
 Player.Character.Humanoid:GetPropertyChangedSignal'JumpPower':Connect(function()
 Player.Character.Humanoid.JumpPower = getgenv().JumpPowerValue;
@@ -2634,7 +2631,7 @@ FakeLag = false
    end,
 })
 
-local Tab = Window:CreateTab("avatar", 7743869517) -- Título, Imagem
+local Tab = Window:CreateTab("avatar", 7743869517) 
 local Section = Tab:CreateSection("diabolical avatars")
 
 local avatarFits = {
@@ -2714,7 +2711,7 @@ local avatarFits = {
 
 {name = "random fit", func = function()
 
- -- Script generated by SimpleSpy - credits to exx#9394
+ 
 
 local args = {
     [1] = {
@@ -2909,7 +2906,7 @@ end},
 
 {name = "cat fit", func = function()
 
-  -- Script generated by SimpleSpy - credits to exx#9394
+  
 
 local args = {
     [1] = {
@@ -3105,7 +3102,7 @@ end},
 
 {name = "weird avatar", func = function()
 
-      -- Script generated by SimpleSpy - credits to exx#9394
+      
 
 local args = {
     [1] = {
@@ -3227,7 +3224,7 @@ end},
 
 {name = "weird avatar 2", func = function()
 
-      -- Script generated by SimpleSpy - credits to exx#9394
+      
 
 local args = {
     [1] = {
@@ -3348,7 +3345,7 @@ end},
 
 {name = "e girl", func = function()
 
-   -- Script generated by SimpleSpy - credits to exx#9394
+   
 
 local args = {
     [1] = {
@@ -3453,7 +3450,7 @@ for _, fit in ipairs(avatarFits) do
     })
 end
 
-local Tab = Window:CreateTab("useful stuff", 133113532239316) -- Title, Image
+local Tab = Window:CreateTab("useful stuff", 133113532239316) 
 local Section = Tab:CreateSection("some things you may use")
 local moreScripts = {
     {name = "Infinite Yield", url = "https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"},
@@ -3465,7 +3462,7 @@ local moreScripts = {
     {name = "R15 Animations GUI", url = "https://pastebin.com/raw/5HNpk2yN"},
     {name = "R15 Animations GUI 2", url = "https://raw.githubusercontent.com/ExploitFin/AquaMatrix/refs/heads/AquaMatrix/AquaMatrix"},
     {name = "Enable Collisions", url = "custom", func = function()
-        -- Enable collisions script
+        
         local LP = game.Players.LocalPlayer
         while task.wait(3) do
             for _, v in pairs(game.Players:GetDescendants()) do
@@ -3511,11 +3508,11 @@ end
 local originalClothing = {}
 
 local function removeClothing(character)
-    -- Store the original clothing templates if not already stored
+    
     if not originalClothing[character] then
         originalClothing[character] = {}
 
-        -- Store shirt and pants templates
+        
         local shirt = character:FindFirstChildOfClass("Shirt")
         local pants = character:FindFirstChildOfClass("Pants")
         if shirt then
@@ -3525,7 +3522,7 @@ local function removeClothing(character)
             originalClothing[character].pantsTemplate = pants.PantsTemplate
         end
 
-        -- Store layered clothing templates (ShirtGraphic, Pants, etc.)
+        
         local layeredShirt = character:FindFirstChildOfClass("ShirtGraphic")
         local layeredPants = character:FindFirstChildOfClass("Pants")
         if layeredShirt then
@@ -3535,7 +3532,7 @@ local function removeClothing(character)
             originalClothing[character].layeredPantsTemplate = layeredPants.PantsTemplate
         end
 
-        -- Store all accessories (hats, hairs, etc.), but not yet remove them
+        
         originalClothing[character].accessories = {}
         for _, item in pairs(character:GetChildren()) do
             if item:IsA("Accessory") then
@@ -3544,7 +3541,7 @@ local function removeClothing(character)
         end
     end
 
-    -- Remove Shirt and Pants for classic clothing
+    
     local shirt = character:FindFirstChildOfClass("Shirt")
     local pants = character:FindFirstChildOfClass("Pants")
     if shirt then
@@ -3554,7 +3551,7 @@ local function removeClothing(character)
         pants.PantsTemplate = "http://www.roblox.com/asset/?id=0"
     end
 
-    -- Remove Layered Clothing (ShirtGraphic, Pants)
+    
     local layeredShirt = character:FindFirstChildOfClass("ShirtGraphic")
     local layeredPants = character:FindFirstChildOfClass("Pants")
     if layeredShirt then
@@ -3564,12 +3561,12 @@ local function removeClothing(character)
         layeredPants.PantsTemplate = "http://www.roblox.com/asset/?id=0"
     end
 
-    -- Remove all accessories except hats and hairs
+    
     for _, item in pairs(character:GetChildren()) do
         if item:IsA("Accessory") then
-            -- Check if the item is a hat or hair (AccessoryType.Hat or AccessoryType.Hair)
+            
             if not (item.AccessoryType == Enum.AccessoryType.Hat or item.AccessoryType == Enum.AccessoryType.Hair) then
-                -- Remove all accessories except hats and hairs
+                
                 item:Destroy()
             end
         end
@@ -3577,7 +3574,7 @@ local function removeClothing(character)
 end
 
 local function restoreClothing(character)
-    -- Restore the original clothing templates
+    
     if originalClothing[character] then
         local shirt = character:FindFirstChildOfClass("Shirt")
         local pants = character:FindFirstChildOfClass("Pants")
@@ -3588,7 +3585,7 @@ local function restoreClothing(character)
             pants.PantsTemplate = originalClothing[character].pantsTemplate
         end
 
-        -- Restore layered clothing (ShirtGraphic, Pants)
+        
         local layeredShirt = character:FindFirstChildOfClass("ShirtGraphic")
         local layeredPants = character:FindFirstChildOfClass("Pants")
         if layeredShirt then
@@ -3598,7 +3595,7 @@ local function restoreClothing(character)
             layeredPants.PantsTemplate = originalClothing[character].layeredPantsTemplate
         end
 
-        -- Restore accessories (including hats and hairs)
+        
         for _, item in pairs(originalClothing[character].accessories) do
             local clonedItem = item:Clone()
             clonedItem.Parent = character
@@ -3609,16 +3606,16 @@ end
 local Toggle = Tab:CreateToggle({
    Name = "Remove player clothes (visual)",
    CurrentValue = false,
-   Flag = "Toggle1", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle1", 
    Callback = function(Value)
    for _, player in pairs(game:GetService("Players"):GetPlayers()) do
-            -- Skip the local player
+            
             if player ~= game.Players.LocalPlayer then
                 local character = player.Character or player.CharacterAdded:Wait()
                 if Value then
-                    removeClothing(character)  -- Remove clothing when toggled on
+                    removeClothing(character)  
                 else
-                    restoreClothing(character)  -- Restore clothing when toggled off
+                    restoreClothing(character)  
                 end
             end
         end
