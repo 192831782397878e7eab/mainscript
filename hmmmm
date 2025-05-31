@@ -538,262 +538,9 @@ local Section = Tab:CreateSection("bullshit by me")
 local scripts = {
     {name = "Firework fling (BUGGY)", url = "https://raw.githubusercontent.com/rolezeay/fireworkfilng/refs/heads/main/hmmm"},
     {name = "Chat Mimicker", url = "https://raw.githubusercontent.com/rolezeay/chatmimicker/refs/heads/main/hmmm"},
-    {name = "Chat logger", url = "custom", func = function()
-                          if game:service('RunService'):IsStudio() then print('!STUDIO!') else
-    if game:service('CoreGui'):findFirstChild('LogHolder') then return nil
-    end
-end
+    {name = "Chat Logger", url = "http://raw.githubusercontent.com/zynlope/askgjuqkwjru-oq/refs/heads/main/hmmmmmm"},
+    {name = "Load E to rewind character", url = "https://raw.githubusercontent.com/zynlope/qkjtkqjwkrjqr/refs/heads/main/hmmmmmm"},
 
-local LogHolder = Instance.new("ScreenGui")
-local Logs = Instance.new("Frame")
-local Scroll = Instance.new("ScrollingFrame")
-local Template = Instance.new("TextLabel")
-
-LogHolder.Name = "LogHolder"
-if game:service('RunService'):IsStudio() then LogHolder.Parent = game.Players.LocalPlayer.PlayerGui else
-    LogHolder.Parent = game.CoreGui
-end
-
-Logs.Name = "Logs"
-Logs.Parent = LogHolder
-Logs.AnchorPoint = Vector2.new(0.5, 0.5)
-Logs.BackgroundColor3 = Color3.new(0, 0, 0)
-Logs.Position = UDim2.new(0.200000003, 0, 0.200000003, 0)
-Logs.Size = UDim2.new(0, 400, 0, 250)
-Logs.Style = Enum.FrameStyle.DropShadow
-
-Scroll.Name = "Scroll"
-Scroll.Parent = Logs
-Scroll.BackgroundColor3 = Color3.new(0, 0, 0)
-Scroll.BackgroundTransparency = 1
-Scroll.BorderSizePixel = 0
-Scroll.Size = UDim2.new(1, 0, 1, 0)
-Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-Scroll.ScrollBarThickness = 6
-
-Template.Name = "Template"
-Template.Parent = Logs
-Template.BackgroundColor3 = Color3.new(1, 1, 1)
-Template.BackgroundTransparency = 1
-Template.Position = UDim2.new(0, 0, 0, -25)
-Template.Size = UDim2.new(1, 0, 0, 20)
-Template.Font = Enum.Font.ArialBold
-Template.Text = ""
-Template.TextColor3 = Color3.new(1, 1, 1)
-Template.TextSize = 15
-Template.TextXAlignment = Enum.TextXAlignment.Left
-Template.TextWrap = true
-
-Logs.Active = true
-Logs.Draggable = true
-
-local loggedTable = {}
-
-local getTotalSize = function()
-local totalSize = UDim2.new(0, 0, 0, 0)
-    
-    for i, v in next, loggedTable do
-        totalSize = totalSize + UDim2.new(0, 0, 0, v.Size.Y.Offset)
-    end
-    
-    return totalSize
-end
-
-local BUD = UDim2.new(0, 0, 0, 0)
-local TotalNum = 0
-
-local function GenLog(txt, colo, time)
-    local oldColo = Color3.fromRGB(0, 0, 0) 
-    
-    local Temp = Template:Clone()
-    Temp.Parent = Scroll
-    Temp.Name = txt..'Logged'
-    Temp.Text = tostring(txt)
-    Temp.Visible = true
-    Temp.Position = BUD + UDim2.new(0, 0, 0, 0)
-    if colo then oldColo = colo Temp.TextColor3 = colo elseif not colo then Temp.TextColor3 = Color3.fromRGB(200, 200, 200) end
-    local timeVal = Instance.new('StringValue', Temp)
-    timeVal.Name = 'TimeVal'
-    timeVal.Value = time
-
-    TotalNum = TotalNum + 1
-    
-    if not Temp.TextFits then repeat Temp.Size = UDim2.new(Temp.Size.X.Scale, Temp.Size.X.Offset, Temp.Size.Y.Scale, Temp.Size.Y.Offset + 10)
-        Temp.Text = txt
-    until Temp.TextFits 
-end
-
-    BUD = BUD + UDim2.new(0, 0, 0, Temp.Size.Y.Offset)
-    
-    table.insert(loggedTable, Temp)
-    
-    local totSize = getTotalSize()
-    
-    if totSize.Y.Offset >= Scroll.CanvasSize.Y.Offset then Scroll.CanvasSize = UDim2.new(totSize.X.Scale, totSize.X.Offset, totSize.Y.Scale, totSize.Y.Offset + 100)
-    Scroll.CanvasPosition = Scroll.CanvasPosition + Vector2.new(0, totSize.Y.Offset) 
-    end
-    
-    return Temp
-end
-
-local ChatData = ""
-
-local function SaveToFile()
-    local t = os.date("*t")
-    local dateDat = t['hour']..' '..t['min']..' '..t['sec']..' '..t['day']..'.'..t['month']..'.'..t['year']
-    
-    ChatData = ""
-    
-    for i, v in pairs(Scroll:GetChildren()) do
-        ChatData = ChatData..v.TimeVal.Value..' '..v.Text..'\n'
-    end
-    
-    writefile('ChatLogs '..dateDat..'.txt', ChatData)
-end
-
-local function Clear()
-    loggedTable = {}
-    ChatData = ""
-    Scroll.CanvasPosition = Vector2.new(0, 0)
-    for i, v in pairs(Scroll:GetChildren()) do
-        v:Destroy()
-    end
-    Scroll.CanvasSize = UDim2.new(0, 0, 0, 0)
-    BUD = UDim2.new(0, 0, 0, 0)
-end
-
-local LogPlr = function(plr)
-            plr.Chatted:connect(function(msg)
-                
-            local t = os.date("*t")
-            local dateDat = t['hour']..':'..t['min']..':'..t['sec']
-    
-            if string.len(msg) >= 1000 then return nil end
-            if string.lower(msg) == 'clear' and plr == game:service('Players').LocalPlayer then Clear() return nil end
-            if string.lower(msg) == 'savetofile' and plr == game:service('Players').LocalPlayer then SaveToFile() return nil end
-            if string.sub(msg, 1, 1):match('%p') and string.sub(msg, 2, 2):match('%a') and string.len(msg) >= 5 then GenLog(plr.Name..': '..msg, Color3.new(255, 0, 0), dateDat) else
-            GenLog(plr.Name..': '..msg, Color3.new(255, 255, 255), dateDat)
-            end
-    end)
-end
-
-for i, v in pairs(game.Players:GetChildren()) do
-    LogPlr(v)
-end
-
-game.Players.PlayerAdded:connect(function(plr)
-    LogPlr(plr)
-end)
-    end},
-    {name = "Load E to rewind character", url = "custom", func = function()
-
-      local key = "E"
-local flashbacklength = 80
-local flashbackspeed = 1.5
-
-if not game:IsLoaded() then game.Loaded:Wait() end
-
-local name = "FlashbackSystem"
-local frames, uis, LP, RS = {}, game:GetService("UserInputService"), game:GetService("Players").LocalPlayer, game:GetService("RunService")
-
-local VRService = game:GetService("VRService")
-if VRService.VREnabled then return end
-
-game:GetService("StarterPlayer").DevComputerMovementMode = Enum.DevComputerMovementMode.KeyboardMouse
-game:GetService("StarterPlayer").DevTouchMovementMode = Enum.DevTouchMovementMode.Thumbstick
-
-if not LP or not uis then return end
-
-pcall(RS.UnbindFromRenderStep, RS, name)
-
-local function getchar()
-   return LP.Character or LP.CharacterAdded:Wait()
-end
-
-function gethrp(c)
-   return c and (c:FindFirstChild("HumanoidRootPart") or c.RootPart or c.PrimaryPart or c:FindFirstChild("Torso") or c:FindFirstChild("UpperTorso") or c:FindFirstChildWhichIsA("BasePart"))
-end
-
-local flashback = { lastinput = false, canrevert = true }
-
-function flashback:Advance(char, hrp, hum, allowinput)
-   if not char or not hrp or not hum then return end
-   if #frames > flashbacklength * 60 then
-       table.remove(frames, 1)
-   end
-
-   if allowinput and not self.canrevert then
-       self.canrevert = true
-   end
-
-   if self.lastinput then
-       hum.PlatformStand = false
-       self.lastinput = false
-   end
-
-   table.insert(frames, {
-       hrp.CFrame,
-       hrp.Velocity,
-       hum:GetState(),
-       hum.PlatformStand,
-       char:FindFirstChildOfClass("Tool")
-   })
-end
-
-function flashback:Revert(char, hrp, hum)
-   if not char or not hrp or not hum or #frames == 0 or not self.canrevert then
-       self.canrevert = false
-       self:Advance(char, hrp, hum)
-       return
-   end
-
-   local num = #frames
-   for i = 1, flashbackspeed do
-       table.remove(frames, num)
-       num = num - 1
-   end
-   
-   self.lastinput = true
-   local lastframe = frames[num]
-   table.remove(frames, num)
-   hrp.CFrame = lastframe[1]
-   hrp.Velocity = -lastframe[2]
-   hum:ChangeState(lastframe[3])
-   hum.PlatformStand = lastframe[4] 
-   
-   local currenttool = char:FindFirstChildOfClass("Tool")
-   if lastframe[5] then
-       if not currenttool then
-           hum:EquipTool(lastframe[5])
-       end
-   else
-       hum:UnequipTools()
-   end
-end
-
-local function step()
-   local char = getchar()
-   local hrp = gethrp(char)
-   local hum = char and char:FindFirstChildWhichIsA("Humanoid")
-   if not char or not hrp or not hum then return end
-   
-   if uis:IsKeyDown(Enum.KeyCode[key]) then
-       flashback:Revert(char, hrp, hum)
-   else
-       flashback:Advance(char, hrp, hum, true)
-   end
-   
-   if uis:IsKeyDown(Enum.KeyCode[killKey]) then
-       RS:UnbindFromRenderStep(name)
-       script:Destroy()
-   end
-end
-
-pcall(function()
-   RS:BindToRenderStep(name, 1, step)
-end)
-
-    end},
     {name = "Midnight Mode", url = "custom", func = function()
         local Lighting = game:GetService("Lighting")
         Lighting.ClockTime = 24
@@ -879,7 +626,6 @@ end)
     end},
 }
 
-
 for _, scriptInfo in ipairs(scripts) do
     Tab:CreateButton({
         Name = scriptInfo.name,
@@ -940,6 +686,7 @@ local TextChatService = game:GetService("TextChatService")
 local Players = game:GetService("Players")
 local localPlayer = Players.LocalPlayer
 
+local Divider = Tab:CreateDivider()
 
 	local function containsSwearWord(word)
 		for swear in pairs(swearWords) do
@@ -1231,144 +978,7 @@ local CopyButton = Tab:CreateButton({
    end,
 })
 
-local function colorToTable(clr)
-    return {tostring(clr.R * 255), tostring(clr.G * 255), tostring(clr.B * 255)}
-end
-
-local function ExtractData(humdes)
-    local ava = {}
-
-    for _, v in pairs({"WidthScale", "HeightScale", "DepthScale", "BodyTypeScale", "ProportionScale", "HeadScale"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"Face", "Head", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Torso"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"HeadColor", "LeftArmColor", "RightArmColor", "LeftLegColor", "RightLegColor", "TorsoColor"}) do
-        ava[v] = colorToTable(humdes[v])
-    end
-
-    for _, v in pairs({"GraphicTShirt", "Shirt", "Pants"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"IdleAnimation", "RunAnimation", "JumpAnimation", "SwimAnimation", "WalkAnimation", "ClimbAnimation", "FallAnimation"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"Hat", "Hair", "Back", "Face", "Front", "Neck", "Shoulders", "Waist"}) do
-        ava[v .. "Accessory"] = humdes[v .. "Accessory"]
-    end
-
-    local layered = humdes:GetAccessories(false)
-    for i, accessory in pairs(layered) do
-        if accessory.AccessoryType and typeof(accessory.AccessoryType) == "EnumItem" then
-            accessory.AccessoryType = accessory.AccessoryType.Name
-        end
-        accessory.Order = i
-    end
-    ava.AccessoryBlob = layered
-
-    ava.Emotes = humdes:GetEmotes()
-
-    return ava
-end
-
-
-local AvatarClipboard = nil
-local AvatarClipboardName = "Unnamed"
-
-local Section = Tab:CreateSection("Avatar Clipboard")
-Section:Set("Avatar Clipboard")
-
-local function copyToClip(data, name)
-    if not data then
-        AvatarClipboard = nil
-        AvatarClipboardName = "Unnamed"
-        Section:Set("Avatar Clipboard")
-    else
-        AvatarClipboard = data
-        AvatarClipboardName = name
-        Section:Set("Avatar Clipboard: " .. name)
-    end
-end
-
-local function LoadPlayer(player)
-    coroutine.wrap(function()
-        if player ~= Players.LocalPlayer then
-            local function LoadCharacter(character)
-                local prox = Instance.new("ProximityPrompt", character:WaitForChild("HumanoidRootPart"))
-                prox.ActionText = "Copy Avatar To Clipboard"
-                prox.ObjectText = player.DisplayName
-                prox.KeyboardKeyCode = Enum.KeyCode.C
-                prox.HoldDuration = 0
-                prox.RequiresLineOfSight = false
-                prox.Triggered:Connect(function()
-                    if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
-                        copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
-                    end
-                end)
-            end
-            LoadCharacter(player.Character or player.CharacterAdded:Wait())
-            player.CharacterAdded:Connect(LoadCharacter)
-        end
-    end)()
-end
-
-for _, player in pairs(Players:GetPlayers()) do
-    LoadPlayer(player)
-end
-Players.PlayerAdded:Connect(LoadPlayer)
-
-Tab:CreateButton({
-    Name = "Copy Current Avatar",
-    Callback = function()
-        local player = Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
-            copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
-        end
-    end
-})
-
-Tab:CreateButton({
-    Name = "Load Avatar",
-    Callback = function()
-        if AvatarClipboard then
-            game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(AvatarClipboard)
-        end
-    end
-})
-
-local LoadAvatarFromUserId = Tab:CreateInput({
-   Name = "Load Avatar From UserId",
-   CurrentValue = "",
-   PlaceholderText = "Enter UserId",
-   RemoveTextAfterFocusLost = false,
-   Flag = "LoadAvatarUserId",
-   Callback = function(userid)
-      if userid and tonumber(userid) and Players:GetHumanoidDescriptionFromUserId(tonumber(userid)) then
-         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(tonumber(userid)))
-        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
-      end
-   end,
-})
-
-local LoadAvatarFromUsername = Tab:CreateInput({
-   Name = "Load Avatar From Username",
-   CurrentValue = "",
-   PlaceholderText = "Enter Username",
-   RemoveTextAfterFocusLost = false,
-   Flag = "LoadAvatarUsername",
-   Callback = function(username)
-      if username and Players:GetUserIdFromNameAsync(username) then
-         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(Players:GetUserIdFromNameAsync(username)))
-          game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
-      end
-   end,
-})
+local Divider = Tab:CreateDivider()
 
 local Toggle = Tab:CreateToggle({
    Name = "Spam pizza plate", 
@@ -2610,6 +2220,8 @@ local Input = Tab:CreateInput({
    end,
 })
 
+local Divider = Tab:CreateDivider()
+
 local Button = Tab:CreateButton({
    Name = "CS Resoluiton",
    Callback = function()
@@ -2652,7 +2264,147 @@ FakeLag = false
 })
 
 local Tab = Window:CreateTab("avatar", 7743869517) 
-local Section = Tab:CreateSection("diabolical avatars")
+
+local function colorToTable(clr)
+    return {tostring(clr.R * 255), tostring(clr.G * 255), tostring(clr.B * 255)}
+end
+
+local function ExtractData(humdes)
+    local ava = {}
+
+    for _, v in pairs({"WidthScale", "HeightScale", "DepthScale", "BodyTypeScale", "ProportionScale", "HeadScale"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"Face", "Head", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Torso"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"HeadColor", "LeftArmColor", "RightArmColor", "LeftLegColor", "RightLegColor", "TorsoColor"}) do
+        ava[v] = colorToTable(humdes[v])
+    end
+
+    for _, v in pairs({"GraphicTShirt", "Shirt", "Pants"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"IdleAnimation", "RunAnimation", "JumpAnimation", "SwimAnimation", "WalkAnimation", "ClimbAnimation", "FallAnimation"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"Hat", "Hair", "Back", "Face", "Front", "Neck", "Shoulders", "Waist"}) do
+        ava[v .. "Accessory"] = humdes[v .. "Accessory"]
+    end
+
+    local layered = humdes:GetAccessories(false)
+    for i, accessory in pairs(layered) do
+        if accessory.AccessoryType and typeof(accessory.AccessoryType) == "EnumItem" then
+            accessory.AccessoryType = accessory.AccessoryType.Name
+        end
+        accessory.Order = i
+    end
+    ava.AccessoryBlob = layered
+
+    ava.Emotes = humdes:GetEmotes()
+
+    return ava
+end
+
+
+local AvatarClipboard = nil
+local AvatarClipboardName = "Unnamed"
+
+local Section = Tab:CreateSection("Avatar Clipboard")
+Section:Set("Avatar Clipboard")
+
+local function copyToClip(data, name)
+    if not data then
+        AvatarClipboard = nil
+        AvatarClipboardName = "Unnamed"
+        Section:Set("Avatar Clipboard")
+    else
+        AvatarClipboard = data
+        AvatarClipboardName = name
+        Section:Set("Avatar Clipboard: " .. name)
+    end
+end
+
+local function LoadPlayer(player)
+    coroutine.wrap(function()
+        if player ~= Players.LocalPlayer then
+            local function LoadCharacter(character)
+                local prox = Instance.new("ProximityPrompt", character:WaitForChild("HumanoidRootPart"))
+                prox.ActionText = "Copy Avatar To Clipboard"
+                prox.ObjectText = player.DisplayName
+                prox.KeyboardKeyCode = Enum.KeyCode.C
+                prox.HoldDuration = 0
+                prox.RequiresLineOfSight = false
+                prox.Triggered:Connect(function()
+                    if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
+                        copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
+                    end
+                end)
+            end
+            LoadCharacter(player.Character or player.CharacterAdded:Wait())
+            player.CharacterAdded:Connect(LoadCharacter)
+        end
+    end)()
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    LoadPlayer(player)
+end
+Players.PlayerAdded:Connect(LoadPlayer)
+
+Tab:CreateButton({
+    Name = "Copy Current Avatar",
+    Callback = function()
+        local player = Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
+            copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
+        end
+    end
+})
+
+Tab:CreateButton({
+    Name = "Load Avatar",
+    Callback = function()
+        if AvatarClipboard then
+            game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(AvatarClipboard)
+        end
+    end
+})
+
+local LoadAvatarFromUserId = Tab:CreateInput({
+   Name = "Load Avatar From UserId",
+   CurrentValue = "",
+   PlaceholderText = "Enter UserId",
+   RemoveTextAfterFocusLost = false,
+   Flag = "LoadAvatarUserId",
+   Callback = function(userid)
+      if userid and tonumber(userid) and Players:GetHumanoidDescriptionFromUserId(tonumber(userid)) then
+         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(tonumber(userid)))
+        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+      end
+   end,
+})
+
+local LoadAvatarFromUsername = Tab:CreateInput({
+   Name = "Load Avatar From Username",
+   CurrentValue = "",
+   PlaceholderText = "Enter Username",
+   RemoveTextAfterFocusLost = false,
+   Flag = "LoadAvatarUsername",
+   Callback = function(username)
+      if username and Players:GetUserIdFromNameAsync(username) then
+         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(Players:GetUserIdFromNameAsync(username)))
+          game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+      end
+   end,
+})
+
+local Divider = Tab:CreateDivider()
 
 local avatarFits = {
     {name = "zynlope exploit fit", func = function()
@@ -2692,420 +2444,108 @@ local avatarFits = {
         game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
     end},
 
-    {name = "project zyn fit", func = function()
-        local args = {
-            [1] = {
-                ["HatAccessory"] = "33070696,3138460373",
-                ["RightLegColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["Face"] = 26343188,
-                ["WidthScale"] = 1,
-                ["BodyTypeScale"] = 0,
-                ["BackAccessory"] = "12632137005",
-                ["FrontAccessory"] = "0",
-                ["AccessoryBlob"] = {{["Order"] = 1, ["AssetId"] = 14411367823, ["AccessoryType"] = "Jacket"}},
-                ["Pants"] = 3911904807,
-                ["RightArmColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["LeftLegColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["HairAccessory"] = "17327436421",
-                ["HeadColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["RightArm"] = 103452055306587,
-                ["Torso"] = 81500432784353,
-                ["IdleAnimation"] = 2510235063,
-                ["RightLeg"] = 18970745060,
-                ["Shirt"] = 87815175853530,
-                ["GraphicTShirt"] = 72395760414645,
-                ["ProportionScale"] = 0,
-                ["RunAnimation"] = 619536621,
-                ["NeckAccessory"] = "11996992458",
-                ["TorsoColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["DepthScale"] = 1,
-                ["LeftArm"] = 87202958751790,
-                ["HeadScale"] = 1,
-                ["HeightScale"] = 1,
-                ["LeftArmColor"] = {[1] = "204", [2] = "142", [3] = "105"},
-                ["LeftLeg"] = 18970745144,
-            }
-        }
-        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-    end},
+{name = "get loading status", func = function()
 
-{name = "random fit", func = function()
 
- 
+local args = {
+    [1] = 2,
+    [2] = true
+}
 
 local args = {
     [1] = {
-        ["WalkAnimation"] = 0,
-        ["Face"] = 823012694,
-        ["ProportionScale"] = 1,
-        ["ClimbAnimation"] = 2510230574,
-        ["Shirt"] = 18792445948,
-        ["FaceAccessory"] = "16206700684",
-        ["RightArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["HairAccessory"] = "110349862432075,18676517458",
-        ["RightArm"] = 0,
-        ["Head"] = 0,
-        ["FallAnimation"] = 0,
-        ["TorsoColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["DepthScale"] = 0.7649999856948853,
-        ["RightLeg"] = 0,
-        ["HeightScale"] = 0.9300000071525574,
-        ["LeftLeg"] = 0,
+        ["WalkAnimation"] = 133304526526319;
         ["RightLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["LeftLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["WidthScale"] = 0.6000000238418579,
-        ["BodyTypeScale"] = 0.5,
-        ["RunAnimation"] = 2510238627,
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
         ["LeftArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["Torso"] = 18087387307;
+        ["ProportionScale"] = 0.5;
+        ["JumpAnimation"] = 130373407996664;
+        ["BodyTypeScale"] = 0;
+        ["RunAnimation"] = 136276875045281;
+        ["Shirt"] = 382537085;
         ["Emotes"] = {
             ["1"] = {
-                [1] = 4940602656
-            },
-            ["8"] = {
-                [1] = 15554010118
-            },
-            ["3"] = {
-                [1] = 3994129128
-            },
-            ["2"] = {
-                [1] = 10147921916
-            },
-            ["5"] = {
-                [1] = 3994130516
-            },
+                [1] = 3576686446;
+            };
             ["4"] = {
-                [1] = 4212499637
-            },
-            ["7"] = {
-                [1] = 6797938823
-            },
-            ["6"] = {
-                [1] = 14353421343
-            }
-        },
-        ["Pants"] = 11908042301,
-        ["AccessoryBlob"] = {},
-        ["WaistAccessory"] = "76627054961155",
-        ["ShouldersAccessory"] = "",
-        ["NeckAccessory"] = "",
-        ["FrontAccessory"] = "",
-        ["SwimAnimation"] = 973772659,
-        ["BackAccessory"] = "15257803225",
-        ["HeadColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["JumpAnimation"] = 2510236649,
-        ["IdleAnimation"] = 2510235063,
-        ["HatAccessory"] = "14424491685,14513366673,11182875464",
-        ["HeadScale"] = 0.9300000071525574,
-        ["Torso"] = 0,
-        ["GraphicTShirt"] = 0,
-        ["LeftArm"] = 0
-    }
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-    end},
-
-{name = "random fit 2", func = function()
-
-local args = {
-    [1] = {
-        ["WalkAnimation"] = 2510242378;
-        ["Torso"] = 0;
-        ["ProportionScale"] = 0.44826775789260864;
-        ["ClimbAnimation"] = 2510230574;
-        ["Shirt"] = 14036469596;
+                [1] = 3576968026;
+            };
+            ["3"] = {
+                [1] = 3576823880;
+            };
+            ["2"] = {
+                [1] = 3360686498;
+            };
+        };
+        ["Pants"] = 301810423;
         ["RightArmColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
         };
-        ["HairAccessory"] = "18867021224";
-        ["RightArm"] = 0;
-        ["Head"] = 134082579;
-        ["FallAnimation"] = 2510233257;
-        ["TorsoColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["DepthScale"] = 0.735045462846756;
-        ["RightLeg"] = 0;
-        ["HeightScale"] = 0.870090901851654;
-        ["LeftLeg"] = 0;
-        ["RightLegColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
+        ["SwimAnimation"] = 128475661806875;
+        ["HairAccessory"] = "135152736088285,62724852";
+        ["Face"] = 86487766;
+        ["RightArm"] = 18087387307;
+        ["RightLeg"] = 18087387307;
+        ["Head"] = 86498113;
+        ["IdleAnimation"] = 101839542383818;
         ["LeftLegColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
         };
-        ["JumpAnimation"] = 2510236649;
-        ["BodyTypeScale"] = 0.48108547925949097;
-        ["RunAnimation"] = 2510238627;
-        ["LeftArmColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 15610015346;
-            };
-            ["8"] = {
-                [1] = 18946876350;
-            };
-            ["3"] = {
-                [1] = 7202900159;
-            };
-            ["2"] = {
-                [1] = 11435175895;
-            };
-            ["5"] = {
-                [1] = 79312439851071;
-            };
-            ["4"] = {
-                [1] = 16303091119;
-            };
-            ["7"] = {
-                [1] = 7202898984;
-            };
-            ["6"] = {
-                [1] = 9710994651;
-            };
-        };
-        ["GraphicTShirt"] = 0;
-        ["SwimAnimation"] = 619537096;
-        ["HatAccessory"] = "17183211696,14108713647";
-        ["Pants"] = 12005356838;
+        ["FallAnimation"] = 83937116921114;
+        ["ClimbAnimation"] = 135810009801094;
         ["HeadColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["LeftArm"] = 0;
-        ["IdleAnimation"] = 2510235063;
-        ["WaistAccessory"] = "15874147588";
-        ["HeadScale"] = 0.925000011920929;
-        ["Face"] = 0;
-        ["WidthScale"] = 0.6000000238418579;
-        ["NeckAccessory"] = "18300024305";
-    };
-}
-
-game:GetService("ReplicatedStorage"):WaitForChild("FunctionConnections", 9e9):WaitForChild("NewAESaveAvatar", 9e9):InvokeServer(unpack(args))
-
-end},
-
-
-{name = "cat fit", func = function()
-
-  
-
-local args = {
-    [1] = {
-        ["WalkAnimation"] = 103190462987721,
-        ["RightLegColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["HeadColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["Torso"] = 139832149249848,
-        ["WidthScale"] = 0.9132782220840454,
-        ["LeftArmColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["BodyTypeScale"] = 1,
-        ["ClimbAnimation"] = 104741822987331,
-        ["Shirt"] = 6486367883,
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 120642514156293
-            },
-            ["8"] = {
-                [1] = 15392927897
-            },
-            ["3"] = {
-                [1] = 12507097350
-            },
-            ["2"] = {
-                [1] = 139021427684680
-            },
-            ["5"] = {
-                [1] = 15554010118
-            },
-            ["4"] = {
-                [1] = 5230661597
-            },
-            ["7"] = {
-                [1] = 17746270218
-            },
-            ["6"] = {
-                [1] = 15506503658
-            }
-        },
-        ["GraphicTShirt"] = 0,
-        ["RightArmColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["JumpAnimation"] = 138641066989023,
-        ["LeftLegColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["Face"] = 0,
-        ["RightArm"] = 131821220111203,
-        ["SwimAnimation"] = 112231179705221,
-        ["Head"] = 137459120414632,
-        ["ProportionScale"] = 1,
-        ["RunAnimation"] = 136276875045281,
-        ["Pants"] = 114219664859076,
-        ["IdleAnimation"] = 101839542383818,
-        ["FallAnimation"] = 72706690305027,
-        ["TorsoColor"] = {
-            [1] = "100.00000163912773",
-            [2] = "95.00000193715096",
-            [3] = "99.00000169873238"
-        },
-        ["DepthScale"] = 1.0816391110420227,
-        ["LeftArm"] = 90053530425094,
-        ["HeadScale"] = 1,
-        ["HeightScale"] = 1.25,
-        ["RightLeg"] = 82777528032059,
-        ["LeftLeg"] = 121864110805253
-    }
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-
-end},
-
-{name = "cat fit 2", func = function()
-
-            local args = {
-    [1] = {
-        ["SwimAnimation"] = 0;
-        ["WalkAnimation"] = 0;
-        ["ProportionScale"] = 0.511454701423645;
-        ["RightLegColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["HatAccessory"] = "98144560652085";
-        ["Torso"] = 111532289455125;
-        ["JumpAnimation"] = 0;
-        ["IdleAnimation"] = 0;
-        ["BodyTypeScale"] = 0.5962028503417969;
-        ["ClimbAnimation"] = 0;
-        ["Shirt"] = 8415319009;
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 14548709888;
-            };
-            ["8"] = {
-                [1] = 5915776835;
-            };
-            ["3"] = {
-                [1] = 10370922566;
-            };
-            ["2"] = {
-                [1] = 12874468267;
-            };
-            ["5"] = {
-                [1] = 7466046574;
-            };
-            ["4"] = {
-                [1] = 11753545334;
-            };
-            ["7"] = {
-                [1] = 4646306583;
-            };
-            ["6"] = {
-                [1] = 4689362868;
-            };
-        };
-        ["GraphicTShirt"] = 0;
-        ["RightArmColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["RightLeg"] = 131359873709031;
-        ["WidthScale"] = 1.0517624616622925;
-        ["Pants"] = 4080983570;
-        ["RightArm"] = 126637196984684;
-        ["FallAnimation"] = 0;
-        ["Head"] = 0;
-        ["LeftLegColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["Face"] = 15432080;
-        ["LeftArmColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
-        };
-        ["LeftLeg"] = 104113560860424;
-        ["HeadColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
         };
         ["TorsoColor"] = {
-            [1] = "248.0000004172325";
-            [2] = "248.0000004172325";
-            [3] = "248.0000004172325";
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
         };
-        ["DepthScale"] = 1.0188917815685272;
-        ["LeftArm"] = 98964144815454;
+        ["DepthScale"] = 0.9550000000000001;
+        ["LeftArm"] = 18087387307;
         ["HeadScale"] = 1;
-        ["HeightScale"] = 0.986021101474762;
-        ["RunAnimation"] = 0;
-        ["WaistAccessory"] = "120583292739858";
+        ["HeightScale"] = 0.91;
+        ["WidthScale"] = 1;
+        ["LeftLeg"] = 18087387307;
     };
 }
 
 game:GetService("ReplicatedStorage"):WaitForChild("FunctionConnections", 9e9):WaitForChild("NewAESaveAvatar", 9e9):InvokeServer(unpack(args))
 
+end},
+
+{name = "load your roblox avatar", func = function()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+        local player = Players.LocalPlayer
+        local userId = player.UserId
+
+        local success, description = pcall(function()
+            return Players:GetHumanoidDescriptionFromUserId(userId)
+        end)
+
+        if success and description then
+            local data = ExtractData(description)
+            ReplicatedStorage.FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+        else
+            warn("Failed to get HumanoidDescription.")
+        end
 end},
 
 {name = "kid", func = function()
@@ -3117,348 +2557,6 @@ local args = {
 }
 
 game:GetService("ReplicatedStorage").FunctionConnections.NewAERequestSetCheesyEffect:InvokeServer(unpack(args))
-
-end},
-
-{name = "weird avatar", func = function()
-
-      
-
-local args = {
-    [1] = {
-        ["SwimAnimation"] = 1018554245,
-        ["Torso"] = 10966673552,
-        ["ProportionScale"] = 0.68,
-        ["ClimbAnimation"] = 1090134016,
-        ["Shirt"] = 144076436,
-        ["FaceAccessory"] = "8923599923,11101973939",
-        ["RightArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["HairAccessory"] = "6564213921,7175904988,7961311720",
-        ["RightArm"] = 2962663610,
-        ["Head"] = 746767604,
-        ["FallAnimation"] = 1018552770,
-        ["TorsoColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["DepthScale"] = 1.25,
-        ["RightLeg"] = 9175317035,
-        ["HeightScale"] = 1.25,
-        ["LeftLeg"] = 9175315737,
-        ["RightLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["LeftLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["JumpAnimation"] = 619511974,
-        ["BodyTypeScale"] = 0.5,
-        ["ShouldersAccessory"] = "14024342720",
-        ["LeftArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 11309263077
-            },
-            ["8"] = {
-                [1] = 11435177473
-            },
-            ["3"] = {
-                [1] = 4849499887
-            },
-            ["2"] = {
-                [1] = 3823158750
-            },
-            ["5"] = {
-                [1] = 11753545334
-            },
-            ["4"] = {
-                [1] = 7466046574
-            },
-            ["7"] = {
-                [1] = 10370922566
-            },
-            ["6"] = {
-                [1] = 5915776835
-            }
-        },
-        ["Pants"] = 144076512,
-        ["HeadColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["WidthScale"] = 1.25,
-        ["Face"] = 0,
-        ["AccessoryBlob"] = {
-            [1] = {
-                ["AccessoryType"] = "Jacket",
-                ["Order"] = 10,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0.550000011920929,
-                ["AssetId"] = 11450182334
-            },
-            [2] = {
-                ["AccessoryType"] = "Pants",
-                ["Order"] = 4,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0,
-                ["AssetId"] = 11162779515
-            },
-            [3] = {
-                ["AccessoryType"] = "Shirt",
-                ["Order"] = 8,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0.25,
-                ["AssetId"] = 10235226324
-            }
-        },
-        ["WaistAccessory"] = "11420192906",
-        ["NeckAccessory"] = "6414371617,5591898874",
-        ["WalkAnimation"] = 5319909330,
-        ["IdleAnimation"] = 1018553897,
-        ["LeftArm"] = 2962661848,
-        ["HeadScale"] = 1.25,
-        ["GraphicTShirt"] = 0,
-        ["RunAnimation"] = 1018548665,
-        ["HatAccessory"] = "5891588282,7097472405,7033033419"
-    }
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-
-end},
-
-
-{name = "weird avatar 2", func = function()
-
-      
-
-local args = {
-    [1] = {
-        ["SwimAnimation"] = 5319927054,
-        ["Torso"] = 10966673552,
-        ["ProportionScale"] = 0.01,
-        ["ClimbAnimation"] = 5319931619,
-        ["Shirt"] = 13982475876,
-        ["FaceAccessory"] = "11101973939",
-        ["RightArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["HairAccessory"] = "6216526940",
-        ["RightArm"] = 11572079320,
-        ["Head"] = 134082579,
-        ["FallAnimation"] = 5319914476,
-        ["TorsoColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["DepthScale"] = 0.925,
-        ["RightLeg"] = 9175317035,
-        ["HeightScale"] = 0.85,
-        ["LeftLeg"] = 9175315737,
-        ["RightLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["LeftLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["JumpAnimation"] = 5319917561,
-        ["BodyTypeScale"] = 0.2,
-        ["RunAnimation"] = 5319900634,
-        ["LeftArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 12507097350
-            },
-            ["8"] = {
-                [1] = 13823339506
-            },
-            ["3"] = {
-                [1] = 4646306583
-            },
-            ["2"] = {
-                [1] = 4689362868
-            },
-            ["5"] = {
-                [1] = 11309263077
-            },
-            ["4"] = {
-                [1] = 7202898984
-            },
-            ["7"] = {
-                [1] = 14353421343
-            },
-            ["6"] = {
-                [1] = 3823158750
-            }
-        },
-        ["Pants"] = 13982473101,
-        ["HeadColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["HatAccessory"] = "6076612186",
-        ["WidthScale"] = 1,
-        ["AccessoryBlob"] = {
-            [1] = {
-                ["AccessoryType"] = "Shirt",
-                ["Order"] = 8,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0.25,
-                ["AssetId"] = 9491351513
-            },
-            [2] = {
-                ["AccessoryType"] = "Pants",
-                ["Order"] = 4,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0,
-                ["AssetId"] = 13914402249
-            },
-            [3] = {
-                ["AccessoryType"] = "Jacket",
-                ["Order"] = 10,
-                ["IsLayered"] = true,
-                ["Puffiness"] = 0.550000011920929,
-                ["AssetId"] = 11450182334
-            }
-        },
-        ["NeckAccessory"] = "11466857481",
-        ["WalkAnimation"] = 5319909330,
-        ["IdleAnimation"] = 5319922112,
-        ["Face"] = 0,
-        ["HeadScale"] = 0.85,
-        ["GraphicTShirt"] = 0,
-        ["LeftArm"] = 10966663299,
-        ["WaistAccessory"] = "6472198409"
-    }
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-
-end},
-
-
-{name = "e girl", func = function()
-
-   
-
-local args = {
-    [1] = {
-        ["SwimAnimation"] = 2510240941,
-        ["Torso"] = 4637151279,
-        ["ProportionScale"] = 0,
-        ["ClimbAnimation"] = 2510230574,
-        ["Shirt"] = 11289085978,
-        ["FaceAccessory"] = "13353986061,12580366888,8923599923",
-        ["RightArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["HairAccessory"] = "13918965164,14314838611",
-        ["RightArm"] = 0,
-        ["Head"] = 0,
-        ["FallAnimation"] = 2510233257,
-        ["TorsoColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["DepthScale"] = 0.8,
-        ["RightLeg"] = 0,
-        ["HeightScale"] = 0.9,
-        ["WaistAccessory"] = "14335771887",
-        ["RightLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["LeftLegColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["WidthScale"] = 0.7,
-        ["BodyTypeScale"] = 0,
-        ["BackAccessory"] = "8651335862",
-        ["LeftArmColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 9528286240
-            },
-            ["8"] = {
-                [1] = 12874468267
-            },
-            ["3"] = {
-                [1] = 7466046574
-            },
-            ["2"] = {
-                [1] = 11309263077
-            },
-            ["4"] = {
-                [1] = 3576968026
-            },
-            ["7"] = {
-                [1] = 13344121112
-            }
-        },
-        ["Pants"] = 14851012835,
-        ["JumpAnimation"] = 2510236649,
-        ["HatAccessory"] = "12579341301,13142881183,1402432199",
-        ["LeftArm"] = 0,
-        ["LeftLeg"] = 0,
-        ["HeadColor"] = {
-            [1] = "248.0000004172325",
-            [2] = "248.0000004172325",
-            [3] = "248.0000004172325"
-        },
-        ["WalkAnimation"] = 2510242378,
-        ["IdleAnimation"] = 2510235063,
-        ["RunAnimation"] = 2510238627,
-        ["HeadScale"] = 1,
-        ["Face"] = 0,
-        ["AccessoryBlob"] = {
-            [1] = {
-                ["Order"] = 1,
-                ["AssetId"] = 12090385963,
-                ["AccessoryType"] = "Jacket"
-            }
-        },
-        ["GraphicTShirt"] = 10891067215
-    }
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-
 
 end},
 }
