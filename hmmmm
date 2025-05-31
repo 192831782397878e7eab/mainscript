@@ -117,7 +117,6 @@ local Window = Rayfield:CreateWindow({
       PlaceholderColor = Color3.fromRGB(178, 178, 178)
    }
 })
-
 local Tab = Window:CreateTab("main", 4483362458) 
 local Section = Tab:CreateSection("change some settings for meepcity here.")
 local StarterGui = game:GetService("StarterGui")
@@ -680,6 +679,387 @@ local Toggle = Tab:CreateToggle({
         end
     end,
 })
+
+local Tab = Window:CreateTab("avatar", "user") 
+
+local function colorToTable(clr)
+    return {tostring(clr.R * 255), tostring(clr.G * 255), tostring(clr.B * 255)}
+end
+
+local function ExtractData(humdes)
+    local ava = {}
+
+    for _, v in pairs({"WidthScale", "HeightScale", "DepthScale", "BodyTypeScale", "ProportionScale", "HeadScale"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"Face", "Head", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Torso"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"HeadColor", "LeftArmColor", "RightArmColor", "LeftLegColor", "RightLegColor", "TorsoColor"}) do
+        ava[v] = colorToTable(humdes[v])
+    end
+
+    for _, v in pairs({"GraphicTShirt", "Shirt", "Pants"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"IdleAnimation", "RunAnimation", "JumpAnimation", "SwimAnimation", "WalkAnimation", "ClimbAnimation", "FallAnimation"}) do
+        ava[v] = humdes[v]
+    end
+
+    for _, v in pairs({"Hat", "Hair", "Back", "Face", "Front", "Neck", "Shoulders", "Waist"}) do
+        ava[v .. "Accessory"] = humdes[v .. "Accessory"]
+    end
+
+    local layered = humdes:GetAccessories(false)
+    for i, accessory in pairs(layered) do
+        if accessory.AccessoryType and typeof(accessory.AccessoryType) == "EnumItem" then
+            accessory.AccessoryType = accessory.AccessoryType.Name
+        end
+        accessory.Order = i
+    end
+    ava.AccessoryBlob = layered
+
+    ava.Emotes = humdes:GetEmotes()
+
+    return ava
+end
+
+
+local AvatarClipboard = nil
+local AvatarClipboardName = "Unnamed"
+
+local Section = Tab:CreateSection("Avatar Clipboard")
+Section:Set("Avatar Clipboard")
+
+local function copyToClip(data, name)
+    if not data then
+        AvatarClipboard = nil
+        AvatarClipboardName = "Unnamed"
+        Section:Set("Avatar Clipboard")
+    else
+        AvatarClipboard = data
+        AvatarClipboardName = name
+        Section:Set("Avatar Clipboard: " .. name)
+    end
+end
+
+local function LoadPlayer(player)
+    coroutine.wrap(function()
+        if player ~= Players.LocalPlayer then
+            local function LoadCharacter(character)
+                local prox = Instance.new("ProximityPrompt", character:WaitForChild("HumanoidRootPart"))
+                prox.ActionText = "Copy Avatar To Clipboard"
+                prox.ObjectText = player.DisplayName
+                prox.KeyboardKeyCode = Enum.KeyCode.C
+                prox.HoldDuration = 0
+                prox.RequiresLineOfSight = false
+                prox.Triggered:Connect(function()
+                    if character and character:FindFirstChild("Humanoid") and character.Humanoid:GetAppliedDescription() then
+                        copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
+                    end
+                end)
+            end
+            LoadCharacter(player.Character or player.CharacterAdded:Wait())
+            player.CharacterAdded:Connect(LoadCharacter)
+        end
+    end)()
+end
+
+for _, player in pairs(Players:GetPlayers()) do
+    LoadPlayer(player)
+end
+Players.PlayerAdded:Connect(LoadPlayer)
+
+Tab:CreateButton({
+    Name = "Copy Current Avatar",
+    Callback = function()
+        local player = Players.LocalPlayer
+        local character = player.Character
+        if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
+            copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
+        end
+    end
+})
+
+Tab:CreateButton({
+    Name = "Load Avatar",
+    Callback = function()
+        if AvatarClipboard then
+            game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(AvatarClipboard)
+        end
+    end
+})
+
+Tab:CreateButton({
+    Name = "Save Avatar",
+    Callback = function()
+        if AvatarClipboard then
+            local broadcastArgs = {
+                [1] = "ZYNLOPE", 
+                [2] = Enum.TextFilterContext.PublicChat
+            }
+
+            local functionConns = game:GetService("ReplicatedStorage"):WaitForChild("FunctionConnections", 9e9)
+
+            functionConns:WaitForChild("RequestBroadcastString", 9e9):InvokeServer(unpack(broadcastArgs))
+
+            local saveArgs = {
+                [1] = AvatarClipboard
+            }
+
+            functionConns:WaitForChild("NewAESaveOutfit", 9e9):InvokeServer(unpack(saveArgs))
+
+         Rayfield:Notify({
+                Title = "Avatar Saver",
+                Content = "Avatar has been saved to Outfits. ",
+                Duration = 3,
+            })
+
+        else
+            Rayfield:Notify({
+                Title = "Avatar Saver",
+                Content = "No avatars in clipboard. ",
+                Duration = 3,
+            })
+        end
+    end
+})
+
+local LoadAvatarFromUserId = Tab:CreateInput({
+   Name = "Load Avatar From UserId",
+   CurrentValue = "",
+   PlaceholderText = "enter userid",
+   RemoveTextAfterFocusLost = false,
+   Flag = "LoadAvatarUserId",
+   Callback = function(userid)
+      if userid and tonumber(userid) and Players:GetHumanoidDescriptionFromUserId(tonumber(userid)) then
+         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(tonumber(userid)))
+        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+      end
+   end,
+})
+
+local LoadAvatarFromUsername = Tab:CreateInput({
+   Name = "Load Avatar From Username",
+   CurrentValue = "",
+   PlaceholderText = "enter username",
+   RemoveTextAfterFocusLost = false,
+   Flag = "LoadAvatarUsername",
+   Callback = function(username)
+      if username and Players:GetUserIdFromNameAsync(username) then
+         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(Players:GetUserIdFromNameAsync(username)))
+          game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+      end
+   end,
+})
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Clipboard = setclipboard or toclipboard
+
+Tab:CreateInput({
+    Name = "Find Username (from server)",
+    PlaceholderText = "enter displayname",
+    RemoveTextAfterFocusLost = false,
+    Callback = function(inputText)
+        local match = nil
+        inputText = inputText:lower()
+        
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.DisplayName:lower():find(inputText) then
+                match = player
+                break
+            end
+        end
+
+        if match then
+            if Clipboard then
+                Clipboard(match.Name)
+            end
+
+            Rayfield:Notify({
+                Title = "Username Copied!",
+                Content = "Copied: " .. match.Name,
+                Duration = 5,
+            })
+        else
+            Rayfield:Notify({
+                Title = "Player Not Found",
+                Content = "No display name matched '" .. inputText .. "'",
+                Duration = 5,
+            })
+        end
+    end,
+})
+
+
+local Divider = Tab:CreateDivider()
+
+local avatarFits = {
+    {name = "zynlope exploit fit", func = function()
+        local args = {
+            [1] = {
+                ["HatAccessory"] = "33070696,9255011,259423244",
+                ["RightLegColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["Face"] = 42070576,
+                ["WidthScale"] = 1,
+                ["BodyTypeScale"] = 0,
+                ["BackAccessory"] = "6736453833",
+                ["FrontAccessory"] = "0",
+                ["AccessoryBlob"] = {{["Order"] = 1, ["AssetId"] = 0, ["AccessoryType"] = "Jacket"}},
+                ["Pants"] = 3911904807,
+                ["RightArmColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["LeftLegColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["HairAccessory"] = "17327436421",
+                ["HeadColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["RightArm"] = 0,
+                ["Torso"] = 0,
+                ["IdleAnimation"] = 2510235063,
+                ["RightLeg"] = 0,
+                ["Shirt"] = 5081914658,
+                ["GraphicTShirt"] = 76168825699893,
+                ["ProportionScale"] = 0,
+                ["RunAnimation"] = 619536621,
+                ["NeckAccessory"] = "11996992458",
+                ["TorsoColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["DepthScale"] = 1,
+                ["LeftArm"] = 0,
+                ["HeadScale"] = 1.1,
+                ["HeightScale"] = 1,
+                ["LeftArmColor"] = {[1] = "0", [2] = "0", [3] = "0"},
+                ["LeftLeg"] = 0,
+            }
+        }
+        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
+    end},
+
+{name = "get loading status", func = function()
+
+
+local args = {
+    [1] = 2,
+    [2] = true
+}
+
+local args = {
+    [1] = {
+        ["WalkAnimation"] = 133304526526319;
+        ["RightLegColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["LeftArmColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["Torso"] = 18087387307;
+        ["ProportionScale"] = 0.5;
+        ["JumpAnimation"] = 130373407996664;
+        ["BodyTypeScale"] = 0;
+        ["RunAnimation"] = 136276875045281;
+        ["Shirt"] = 382537085;
+        ["Emotes"] = {
+            ["1"] = {
+                [1] = 3576686446;
+            };
+            ["4"] = {
+                [1] = 3576968026;
+            };
+            ["3"] = {
+                [1] = 3576823880;
+            };
+            ["2"] = {
+                [1] = 3360686498;
+            };
+        };
+        ["Pants"] = 301810423;
+        ["RightArmColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["SwimAnimation"] = 128475661806875;
+        ["HairAccessory"] = "135152736088285,62724852";
+        ["Face"] = 86487766;
+        ["RightArm"] = 18087387307;
+        ["RightLeg"] = 18087387307;
+        ["Head"] = 86498113;
+        ["IdleAnimation"] = 101839542383818;
+        ["LeftLegColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["FallAnimation"] = 83937116921114;
+        ["ClimbAnimation"] = 135810009801094;
+        ["HeadColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["TorsoColor"] = {
+            [1] = "255";
+            [2] = "152";
+            [3] = "220";
+        };
+        ["DepthScale"] = 0.9550000000000001;
+        ["LeftArm"] = 18087387307;
+        ["HeadScale"] = 1;
+        ["HeightScale"] = 0.91;
+        ["WidthScale"] = 1;
+        ["LeftLeg"] = 18087387307;
+    };
+}
+
+game:GetService("ReplicatedStorage"):WaitForChild("FunctionConnections", 9e9):WaitForChild("NewAESaveAvatar", 9e9):InvokeServer(unpack(args))
+
+end},
+
+{name = "reset to roblox avatar", func = function()
+
+local Players = game:GetService("Players")
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+        local player = Players.LocalPlayer
+        local userId = player.UserId
+
+        local success, description = pcall(function()
+            return Players:GetHumanoidDescriptionFromUserId(userId)
+        end)
+
+        if success and description then
+            local data = ExtractData(description)
+            ReplicatedStorage.FunctionConnections.NewAESaveAvatar:InvokeServer(data)
+        else
+            warn("Failed to get HumanoidDescription.")
+        end
+end},
+
+{name = "kid size", func = function()
+
+
+local args = {
+    [1] = 2,
+    [2] = true
+}
+
+game:GetService("ReplicatedStorage").FunctionConnections.NewAERequestSetCheesyEffect:InvokeServer(unpack(args))
+
+end},
+}
+
+for _, fit in ipairs(avatarFits) do
+    Tab:CreateButton({
+        Name = fit.name,
+        Callback = fit.func,
+    })
+end
+
 local Tab = Window:CreateTab("bypasser", 78656669261642) 
 local Paragraph = Tab:CreateParagraph({Title = "WARNING:", Content = "Set your account language to Қазақ Тілі for every bypass to work."})
 local TextChatService = game:GetService("TextChatService")
@@ -980,6 +1360,15 @@ local CopyButton = Tab:CreateButton({
 
 local Divider = Tab:CreateDivider()
 
+local Button = Tab:CreateButton({
+   Name = "Firework (Manual)",
+   Callback = function()
+ game:GetService("ReplicatedStorage").Connection:InvokeServer(202, 1310)
+        game:GetService("ReplicatedStorage").Connection:InvokeServer(201, 1310, {})
+        game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(210)
+   end,
+})
+
 local Toggle = Tab:CreateToggle({
    Name = "Spam pizza plate", 
    CurrentValue = false,
@@ -1028,15 +1417,6 @@ local Toggle = Tab:CreateToggle({
             isSpamming = false
         end
     end,
-})
-
-local Button = Tab:CreateButton({
-   Name = "Firework (Manual)",
-   Callback = function()
- game:GetService("ReplicatedStorage").Connection:InvokeServer(202, 1310)
-        game:GetService("ReplicatedStorage").Connection:InvokeServer(201, 1310, {})
-        game:GetService("ReplicatedStorage").ConnectionEvent:FireServer(210)
-   end,
 })
 
 local spawnFirework = false 
@@ -2262,311 +2642,6 @@ local Button = Tab:CreateButton({
 FakeLag = false
    end,
 })
-
-local Tab = Window:CreateTab("avatar", 7743869517) 
-
-local function colorToTable(clr)
-    return {tostring(clr.R * 255), tostring(clr.G * 255), tostring(clr.B * 255)}
-end
-
-local function ExtractData(humdes)
-    local ava = {}
-
-    for _, v in pairs({"WidthScale", "HeightScale", "DepthScale", "BodyTypeScale", "ProportionScale", "HeadScale"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"Face", "Head", "LeftArm", "RightArm", "LeftLeg", "RightLeg", "Torso"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"HeadColor", "LeftArmColor", "RightArmColor", "LeftLegColor", "RightLegColor", "TorsoColor"}) do
-        ava[v] = colorToTable(humdes[v])
-    end
-
-    for _, v in pairs({"GraphicTShirt", "Shirt", "Pants"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"IdleAnimation", "RunAnimation", "JumpAnimation", "SwimAnimation", "WalkAnimation", "ClimbAnimation", "FallAnimation"}) do
-        ava[v] = humdes[v]
-    end
-
-    for _, v in pairs({"Hat", "Hair", "Back", "Face", "Front", "Neck", "Shoulders", "Waist"}) do
-        ava[v .. "Accessory"] = humdes[v .. "Accessory"]
-    end
-
-    local layered = humdes:GetAccessories(false)
-    for i, accessory in pairs(layered) do
-        if accessory.AccessoryType and typeof(accessory.AccessoryType) == "EnumItem" then
-            accessory.AccessoryType = accessory.AccessoryType.Name
-        end
-        accessory.Order = i
-    end
-    ava.AccessoryBlob = layered
-
-    ava.Emotes = humdes:GetEmotes()
-
-    return ava
-end
-
-
-local AvatarClipboard = nil
-local AvatarClipboardName = "Unnamed"
-
-local Section = Tab:CreateSection("Avatar Clipboard")
-Section:Set("Avatar Clipboard")
-
-local function copyToClip(data, name)
-    if not data then
-        AvatarClipboard = nil
-        AvatarClipboardName = "Unnamed"
-        Section:Set("Avatar Clipboard")
-    else
-        AvatarClipboard = data
-        AvatarClipboardName = name
-        Section:Set("Avatar Clipboard: " .. name)
-    end
-end
-
-local function LoadPlayer(player)
-    coroutine.wrap(function()
-        if player ~= Players.LocalPlayer then
-            local function LoadCharacter(character)
-                local prox = Instance.new("ProximityPrompt", character:WaitForChild("HumanoidRootPart"))
-                prox.ActionText = "Copy Avatar To Clipboard"
-                prox.ObjectText = player.DisplayName
-                prox.KeyboardKeyCode = Enum.KeyCode.C
-                prox.HoldDuration = 0
-                prox.RequiresLineOfSight = false
-                prox.Triggered:Connect(function()
-                    if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
-                        copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
-                    end
-                end)
-            end
-            LoadCharacter(player.Character or player.CharacterAdded:Wait())
-            player.CharacterAdded:Connect(LoadCharacter)
-        end
-    end)()
-end
-
-for _, player in pairs(Players:GetPlayers()) do
-    LoadPlayer(player)
-end
-Players.PlayerAdded:Connect(LoadPlayer)
-
-Tab:CreateButton({
-    Name = "Copy Current Avatar",
-    Callback = function()
-        local player = Players.LocalPlayer
-        local character = player.Character
-        if character and character:FindFirstChild("Humanoid") and character.Humanoid:FindFirstChild("HumanoidDescription") then
-            copyToClip(ExtractData(character.Humanoid.HumanoidDescription), player.DisplayName)
-        end
-    end
-})
-
-Tab:CreateButton({
-    Name = "Load Avatar",
-    Callback = function()
-        if AvatarClipboard then
-            game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(AvatarClipboard)
-        end
-    end
-})
-
-local LoadAvatarFromUserId = Tab:CreateInput({
-   Name = "Load Avatar From UserId",
-   CurrentValue = "",
-   PlaceholderText = "Enter UserId",
-   RemoveTextAfterFocusLost = false,
-   Flag = "LoadAvatarUserId",
-   Callback = function(userid)
-      if userid and tonumber(userid) and Players:GetHumanoidDescriptionFromUserId(tonumber(userid)) then
-         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(tonumber(userid)))
-        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
-      end
-   end,
-})
-
-local LoadAvatarFromUsername = Tab:CreateInput({
-   Name = "Load Avatar From Username",
-   CurrentValue = "",
-   PlaceholderText = "Enter Username",
-   RemoveTextAfterFocusLost = false,
-   Flag = "LoadAvatarUsername",
-   Callback = function(username)
-      if username and Players:GetUserIdFromNameAsync(username) then
-         local data = ExtractData(Players:GetHumanoidDescriptionFromUserId(Players:GetUserIdFromNameAsync(username)))
-          game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(data)
-      end
-   end,
-})
-
-local Divider = Tab:CreateDivider()
-
-local avatarFits = {
-    {name = "zynlope exploit fit", func = function()
-        local args = {
-            [1] = {
-                ["HatAccessory"] = "33070696,9255011,259423244",
-                ["RightLegColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["Face"] = 42070576,
-                ["WidthScale"] = 1,
-                ["BodyTypeScale"] = 0,
-                ["BackAccessory"] = "6736453833",
-                ["FrontAccessory"] = "0",
-                ["AccessoryBlob"] = {{["Order"] = 1, ["AssetId"] = 0, ["AccessoryType"] = "Jacket"}},
-                ["Pants"] = 3911904807,
-                ["RightArmColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["LeftLegColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["HairAccessory"] = "17327436421",
-                ["HeadColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["RightArm"] = 0,
-                ["Torso"] = 0,
-                ["IdleAnimation"] = 2510235063,
-                ["RightLeg"] = 0,
-                ["Shirt"] = 5081914658,
-                ["GraphicTShirt"] = 76168825699893,
-                ["ProportionScale"] = 0,
-                ["RunAnimation"] = 619536621,
-                ["NeckAccessory"] = "11996992458",
-                ["TorsoColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["DepthScale"] = 1,
-                ["LeftArm"] = 0,
-                ["HeadScale"] = 1.1,
-                ["HeightScale"] = 1,
-                ["LeftArmColor"] = {[1] = "0", [2] = "0", [3] = "0"},
-                ["LeftLeg"] = 0,
-            }
-        }
-        game:GetService("ReplicatedStorage").FunctionConnections.NewAESaveAvatar:InvokeServer(unpack(args))
-    end},
-
-{name = "get loading status", func = function()
-
-
-local args = {
-    [1] = 2,
-    [2] = true
-}
-
-local args = {
-    [1] = {
-        ["WalkAnimation"] = 133304526526319;
-        ["RightLegColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["LeftArmColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["Torso"] = 18087387307;
-        ["ProportionScale"] = 0.5;
-        ["JumpAnimation"] = 130373407996664;
-        ["BodyTypeScale"] = 0;
-        ["RunAnimation"] = 136276875045281;
-        ["Shirt"] = 382537085;
-        ["Emotes"] = {
-            ["1"] = {
-                [1] = 3576686446;
-            };
-            ["4"] = {
-                [1] = 3576968026;
-            };
-            ["3"] = {
-                [1] = 3576823880;
-            };
-            ["2"] = {
-                [1] = 3360686498;
-            };
-        };
-        ["Pants"] = 301810423;
-        ["RightArmColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["SwimAnimation"] = 128475661806875;
-        ["HairAccessory"] = "135152736088285,62724852";
-        ["Face"] = 86487766;
-        ["RightArm"] = 18087387307;
-        ["RightLeg"] = 18087387307;
-        ["Head"] = 86498113;
-        ["IdleAnimation"] = 101839542383818;
-        ["LeftLegColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["FallAnimation"] = 83937116921114;
-        ["ClimbAnimation"] = 135810009801094;
-        ["HeadColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["TorsoColor"] = {
-            [1] = "255";
-            [2] = "152";
-            [3] = "220";
-        };
-        ["DepthScale"] = 0.9550000000000001;
-        ["LeftArm"] = 18087387307;
-        ["HeadScale"] = 1;
-        ["HeightScale"] = 0.91;
-        ["WidthScale"] = 1;
-        ["LeftLeg"] = 18087387307;
-    };
-}
-
-game:GetService("ReplicatedStorage"):WaitForChild("FunctionConnections", 9e9):WaitForChild("NewAESaveAvatar", 9e9):InvokeServer(unpack(args))
-
-end},
-
-{name = "load your roblox avatar", func = function()
-
-local Players = game:GetService("Players")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-
-        local player = Players.LocalPlayer
-        local userId = player.UserId
-
-        local success, description = pcall(function()
-            return Players:GetHumanoidDescriptionFromUserId(userId)
-        end)
-
-        if success and description then
-            local data = ExtractData(description)
-            ReplicatedStorage.FunctionConnections.NewAESaveAvatar:InvokeServer(data)
-        else
-            warn("Failed to get HumanoidDescription.")
-        end
-end},
-
-{name = "kid", func = function()
-
-
-local args = {
-    [1] = 2,
-    [2] = true
-}
-
-game:GetService("ReplicatedStorage").FunctionConnections.NewAERequestSetCheesyEffect:InvokeServer(unpack(args))
-
-end},
-}
-
-for _, fit in ipairs(avatarFits) do
-    Tab:CreateButton({
-        Name = fit.name,
-        Callback = fit.func,
-    })
-end
 
 local Tab = Window:CreateTab("useful stuff", 133113532239316) 
 local Section = Tab:CreateSection("some things you may use")
