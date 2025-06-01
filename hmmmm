@@ -895,8 +895,37 @@ Tab:CreateInput({
     end,
 })
 
-
 local Divider = Tab:CreateDivider()
+
+Tab:CreateToggle({
+    Name = "weeknd emote",
+    CurrentValue = false,
+    Flag = "Toggle1",
+    Callback = function(Value)
+        local p = game:GetService("Players").LocalPlayer
+        local c = p.Character or p.CharacterAdded:Wait()
+        local h = c:FindFirstChildOfClass("Humanoid")
+        
+        if not getgenv().WeekndTrack then
+            local a = Instance.new("Animation")
+            a.AnimationId = "rbxassetid://71105746210464"
+            getgenv().WeekndAnim = a
+        end
+
+        if Value then
+            if h and not getgenv().WeekndTrack then
+                getgenv().WeekndTrack = h:LoadAnimation(getgenv().WeekndAnim)
+                getgenv().WeekndTrack.Looped = true
+                getgenv().WeekndTrack:Play()
+            end
+        else
+            if getgenv().WeekndTrack then
+                getgenv().WeekndTrack:Stop()
+                getgenv().WeekndTrack = nil
+            end
+        end
+    end,
+})
 
 local avatarFits = {
     {name = "zynlope exploit fit", func = function()
