@@ -46,7 +46,7 @@ local title = randomGreeting .. ", " .. playerName .. " - " .. currentTime
 
 local Window = Rayfield:CreateWindow({
    Name = title,
-   Icon = 85391913891710,
+   Icon = 109432796928380,
    LoadingTitle = "zynlope rewrite",
    LoadingSubtitle = "discord: plusgiant",
 
@@ -87,7 +87,7 @@ local Window = Rayfield:CreateWindow({
 
       TabBackground = Color3.fromRGB(20, 20, 20),
       TabStroke = Color3.fromRGB(85, 85, 85),
-      TabBackgroundSelected = Color3.fromRGB(255, 163, 163),
+      TabBackgroundSelected = Color3.fromRGB(246, 171, 61),
       TabTextColor = Color3.fromRGB(240, 240, 240),
       SelectedTabTextColor = Color3.fromRGB(40, 40, 40),
 
@@ -102,9 +102,9 @@ local Window = Rayfield:CreateWindow({
       SliderStroke = Color3.fromRGB(58, 163, 255),
 
       ToggleBackground = Color3.fromRGB(18, 18, 18),
-      ToggleEnabled = Color3.fromRGB(255, 163, 163),
+      ToggleEnabled = Color3.fromRGB(246, 171, 61),
       ToggleDisabled = Color3.fromRGB(100, 100, 100),
-      ToggleEnabledStroke = Color3.fromRGB(69, 69, 69),
+      ToggleEnabledStroke = Color3.fromRGB(246, 171, 61),
       ToggleDisabledStroke = Color3.fromRGB(125, 125, 125),
       ToggleEnabledOuterStroke = Color3.fromRGB(100, 100, 100),
       ToggleDisabledOuterStroke = Color3.fromRGB(65, 65, 65),
@@ -531,7 +531,7 @@ local Button = Tab:CreateButton({
    end,
 })
 
-local Tab = Window:CreateTab("zynlope", 85391913891710) 
+local Tab = Window:CreateTab("zynlope", 109432796928380) 
 local Section = Tab:CreateSection("bullshit by me")
 
 local scripts = {
