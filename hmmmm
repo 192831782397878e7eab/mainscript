@@ -2196,7 +2196,7 @@ local Input = Tab:CreateInput({
      local giga = game.Players.LocalPlayer.Character
     local liga = giga:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
 
-    for i,v in next, liga:GetPlayinganims() do
+    for i,v in next, liga:GetPlayingAnimationTracks() do
         v:AdjustSpeed(value)
     end
    end,
@@ -2208,7 +2208,7 @@ local Button = Tab:CreateButton({
  local giga = game.Players.LocalPlayer.Character
     local liga = giga:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
 
-    for i,v in next, liga:GetPlayinganims() do
+    for i,v in next, liga:GetPlayingAnimationTracks() do
         v:AdjustSpeed(v.Speed * 2)
     end
    end,
@@ -2220,7 +2220,7 @@ local Button = Tab:CreateButton({
 local giga = game.Players.LocalPlayer.Character
     local liga = giga:FindFirstChildOfClass("Humanoid") or Char:FindFirstChildOfClass("AnimationController")
 
-    for i,v in next, liga:GetPlayinganims() do
+    for i,v in next, liga:GetPlayingAnimationTracks() do
         v:AdjustSpeed(v.Speed * 0.5)
     end
    end,
