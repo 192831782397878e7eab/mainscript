@@ -1185,41 +1185,22 @@ local ieatdih2 = {
 }
 
 local function chonk9677(inputText)
-    local ieatdih3 = {}
+    local transformedWords = {}
 
     for word in inputText:gmatch("%S+") do
-        local cleaned = word:gsub("%p", "")
-        local lowered = cleaned:lower()
-        local replacedWord = word
-        local found = false
-
-        for bad, bypass in pairs(ieatdih1) do
-            local startIndex, endIndex = lowered:find(bad, 1, true)
-            if startIndex then
-                
-                replacedWord = cleaned:sub(1, startIndex - 1) .. bypass .. cleaned:sub(endIndex + 1)
-                found = true
-                break
-            end
+        -- Apply the transformation from transformText here:
+        word = word:gsub("l", "I")
+        
+        if #word > 2 then
+            word = word:sub(1, 2) .. "ꜗ" .. word:sub(3)
         end
 
-        if not found then
-            for bad, bypass in pairs(ieatdih2) do
-                local loweredBad = bad:lower()
-                local startIndex, endIndex = lowered:find(loweredBad, 1, true)
-                if startIndex then
-                    replacedWord = cleaned:sub(1, startIndex - 1) .. bypass .. cleaned:sub(endIndex + 1)
-                    found = true
-                    break
-                end
-            end
-        end
-
-        table.insert(ieatdih3, replacedWord)
+        table.insert(transformedWords, word)
     end
 
-    return table.concat(ieatdih3, "")
+    return table.concat(transformedWords, "")
 end
+
 
 	
 	local function zorp4871(message)
